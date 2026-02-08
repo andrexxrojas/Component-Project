@@ -17,7 +17,7 @@ export default function Landing() {
                 </p>
                 <button
                     className={styles['btn']}
-                    onClick={() => navigate("/auth")}
+                    onClick={() => navigate("/auth?type=register")}
                 >
                     <span className={styles["btn-txt"]}>Start Building</span>
                     <ArrowRightIcon size={15} weight="bold"/>

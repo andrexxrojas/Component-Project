@@ -36,6 +36,9 @@
 }
 
 :root {
+    /* LAYOUT */
+    --layout-padding: 24px; /* DEFAULT */
+
     /* FONT FAMILY */;
     --font-light: 'InterTight Light', sans-serif;
     --font-regular: 'InterTight Regular', sans-serif;

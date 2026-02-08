@@ -13,13 +13,13 @@ export default function TopNav() {
                 <div className={styles["buttons-container"]}>
                     <button
                         className={`${styles["btn"]} ${styles["login"]}`}
-                        onClick={() => navigate("/auth?to=login")}
+                        onClick={() => navigate("/auth?type=login")}
                     >
                         <span className={styles["btn-txt"]}>Log In</span>
                     </button>
                     <button
                         className={`${styles["btn"]} ${styles["register"]}`}
-                        onClick={() => navigate("/auth?to=register")}
+                        onClick={() => navigate("/auth?type=register")}
                     >
                         <span className={styles["btn-txt"]}>Get Started</span>
                     </button>
