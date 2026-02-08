@@ -1,0 +1,51 @@
+import {Routes, Route} from "react-router-dom";
+import Layout from "../components/Layout/Layout";
+import {ProtectedRoute, PublicRoute} from "../components/RouteGuards/RouteGuards";
+import Auth from "../pages/Auth/Auth";
+
+// Pages
+import Auth from "../pages/Auth/Auth.jsx";
+import Editor from "../pages/Editor/Editor.jsx";
+import Landing from "../pages/Landing/Landing.jsx";
+import NotFound from "../pages/NotFound/NotFound.jsx";
+import Dashboard from "../pages/Dashboard/Dashboard.jsx";
+import ProjectView from "../pages/ProjectView/ProjectView.jsx";
+
+export default function AppRoutes() {
+    return (
+        <Layout>
+            <Routes>
+                <Route path="/" element={
+                    <PublicRoute>
+                        <Landing />
+                    </PublicRoute>
+                }/>
+                <Route path="/auth" element={
+                    <PublicRoute>
+                        <Auth />
+                    </PublicRoute>
+                }/>
+                <Route path="/projects" element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                }/>
+                <Route path="/projects/:id" element={
+                    <ProtectedRoute>
+                        <ProjectView />
+                    </ProtectedRoute>
+                }/>
+                <Route path="/editor/:projectId/:componentId" element={
+                    <ProtectedRoute>
+                        <Editor />
+                    </ProtectedRoute>
+                }/>
+                <Route path="*" element={
+                    <PublicRoute>
+                        <NotFound />
+                    </PublicRoute>
+                }/>
+            </Routes>
+        </Layout>
+    )
+}
