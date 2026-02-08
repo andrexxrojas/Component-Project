@@ -1,11 +1,11 @@
-import styles from "./Dashboard.module.css";
+import styles from "./MyComponents.module.css";
 import AuthenticatedNav from "../../components/AuthenticatedNav/AuthenticatedNav.jsx";
 import SideNavWrapper from "../../components/SideNavWrapper/SideNavWrapper.jsx";
 import HeaderControls from "./components/HeaderControls/HeaderControls.jsx";
 
-export default function Dashboard() {
+export default function MyComponents() {
     return (
-        <div className={styles["dashboard-wrapper"]}>
+        <div className={styles["my-components-wrapper"]}>
             <AuthenticatedNav />
             <SideNavWrapper>
                 <HeaderControls />

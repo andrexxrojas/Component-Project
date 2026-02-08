@@ -9,6 +9,7 @@ import Landing from "../pages/Landing/Landing.jsx";
 import NotFound from "../pages/NotFound/NotFound.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
 import ProjectView from "../pages/ProjectView/ProjectView.jsx";
+import MyComponents from "../pages/MyComponents/MyComponents.jsx";
 
 export default function AppRoutes() {
     return (
@@ -27,6 +28,11 @@ export default function AppRoutes() {
                 <Route path="/projects" element={
                     <ProtectedRoute>
                         <Dashboard />
+                    </ProtectedRoute>
+                }/>
+                <Route path="/components" element={
+                    <ProtectedRoute>
+                        <MyComponents />
                     </ProtectedRoute>
                 }/>
                 <Route path="/projects/:id" element={
