@@ -3,7 +3,7 @@ import {PlusIcon} from "@phosphor-icons/react";
 
 export default function HeaderControls() {
     return (
-        <div className={styles['header-container']}>
+        <div className={styles["header-container"]}>
             <div className={styles["header-info"]}>
                 <h1 className={styles["header-title"]}>Components</h1>
                 <p className={styles["header-subtitle"]}>
