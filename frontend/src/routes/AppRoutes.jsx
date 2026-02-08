@@ -1,7 +1,6 @@
 import {Routes, Route} from "react-router-dom";
 import Layout from "../components/Layout/Layout";
 import {ProtectedRoute, PublicRoute} from "../components/RouteGuards/RouteGuards";
-import Auth from "../pages/Auth/Auth";
 
 // Pages
 import Auth from "../pages/Auth/Auth.jsx";

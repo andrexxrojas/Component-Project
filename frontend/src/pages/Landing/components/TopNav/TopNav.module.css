@@ -1,0 +1,45 @@
+.nav-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 1440px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.logo-txt {
+    font-family: var(--font-bold);
+    font-size: var(--font-size-sm);
+}
+
+.buttons-container {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xs);
+    padding: var(--small-btn-padding);
+    border-radius: var(--small-btn-radius);
+    border: none;
+    outline: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.btn.login {
+    background-color: transparent;
+}
+
+.btn.register {
+    background-color: var(--btn-bg);
+}
