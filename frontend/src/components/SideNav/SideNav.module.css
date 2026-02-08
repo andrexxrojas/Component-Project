@@ -1,0 +1,96 @@
+.nav-container {
+    background-color: #FCFCFC;
+    border-right: 1px solid var(--neutral-200);
+    width: var(--sidebar-width);
+    position: fixed;
+    left: 0;
+    top: 4.4rem;
+    height: calc(100% - 4.4rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.top-group {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.group-label {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xs);
+    color: var(--neutral-400);
+    margin-bottom: 0.5rem;
+    padding: var(--layout-padding) var(--layout-padding) 0 var(--layout-padding);
+}
+
+.buttons-container {
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.btn {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xs);
+    color: var(--neutral-400);
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: var(--small-btn-radius);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    user-select: none;
+    cursor: pointer;
+    gap: 0.5rem;
+}
+
+.btn.active {
+    background-color: #F4F4F5;
+    color: var(--neutral-950);
+    pointer-events: none;
+}
+
+.btn:hover {
+    background-color: #F7F7F8;
+}
+
+.bottom-group {
+    padding: calc(var(--layout-padding) - 0.5rem);
+    border-top: 1px solid var(--neutral-200);
+}
+
+.account-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    border-radius: var(--small-btn-radius);
+    padding: 0.5rem;
+    user-select: none;
+    cursor: pointer;
+}
+
+.logout-icon {
+    opacity: 0;
+}
+
+.account-container:hover {
+    background-color: #F7F7F8;
+}
+
+.account-container:hover .logout-icon {
+    opacity: 1;
+}
+
+.account-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}

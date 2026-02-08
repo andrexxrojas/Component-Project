@@ -1,3 +1,7 @@
+.landing-wrapper {
+    padding: var(--layout-padding);
+}
+
 .hero-container {
     padding-block: 12rem;
     display: flex;

@@ -76,6 +76,7 @@
 
     /* GENERAL BUTTON */
     --btn-bg: var(--neutral-50);
+    --btn-bg-hover: var(--neutral-100);
 
     /* SMALL BUTTON */
     --small-btn-padding: 0.5rem 1rem;
@@ -84,4 +85,7 @@
     /* LARGE BUTTON */
     --large-btn-padding: 0.75rem 2rem;
     --large-btn-radius: 0.75rem;
+
+    /* SIDEBAR */
+    --sidebar-width: 250px;
 }

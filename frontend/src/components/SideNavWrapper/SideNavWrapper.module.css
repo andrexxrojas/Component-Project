@@ -1,0 +1,4 @@
+.main-container {
+    margin-left: var(--sidebar-width);
+    padding: var(--layout-padding);
+}

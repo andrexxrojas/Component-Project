@@ -21,7 +21,7 @@ export function PublicRoute({ children }) {
   if (isLoggedIn === null) return null; // still checking
 
   if (isLoggedIn) {
-    return <Navigate to="/my-projects" replace />;
+    return <Navigate to="/projects" replace />;
   }
 
   return children;
