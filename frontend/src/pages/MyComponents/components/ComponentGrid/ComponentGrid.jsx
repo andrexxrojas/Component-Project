@@ -8,10 +8,22 @@ import {
     TrashIcon
 } from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
+import {useModal} from "../../../../context/ModalContext.jsx";
 
 const ComponentBox = ({title, preview}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
+    const { openModal } = useModal();
+
+    const handleAddToProject = () => {
+        setShowMenu(false);
+        openModal("addToProject");
+    }
+
+    const handleRename = () => {
+        setShowMenu(false);
+        openModal("renameComponent");
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -42,11 +54,11 @@ const ComponentBox = ({title, preview}) => {
                     </button>
                     {showMenu && (
                         <div className={styles["dropdown-menu"]}>
-                            <button className={styles["menu-item"]}>
+                            <button className={styles["menu-item"]} onClick={handleRename}>
                                 <PencilSimpleIcon size={16}/>
                                 Rename
                             </button>
-                            <button className={styles["menu-item"]}>
+                            <button className={styles["menu-item"]} onClick={handleAddToProject}>
                                 <FolderSimplePlusIcon size={16}/>
                                 Add to project
                             </button>

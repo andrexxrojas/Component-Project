@@ -1,7 +1,14 @@
 import styles from "./HeaderControls.module.css";
 import {PlusIcon} from "@phosphor-icons/react";
+import {useModal} from "../../../../context/ModalContext.jsx";
 
 export default function HeaderControls() {
+    const { openModal } = useModal();
+
+    const handleNewProject = () => {
+        openModal("createProject");
+    }
+
     return (
         <div className={styles['header-container']}>
             <div className={styles["header-info"]}>
@@ -11,7 +18,7 @@ export default function HeaderControls() {
                 </p>
             </div>
             <div className={styles["header-controls"]}>
-                <button className={styles["btn"]}>
+                <button className={styles["btn"]} onClick={handleNewProject}>
                     <PlusIcon size={16}/>
                     <span className={styles["btn-txt"]}>
                         New Project

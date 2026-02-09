@@ -7,10 +7,17 @@ import {
     TrashIcon
 } from "@phosphor-icons/react";
 import {useState, useEffect, useRef} from "react";
+import {useModal} from "../../../../context/ModalContext.jsx";
 
 const ProjectBox = ({title, description}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
+    const { openModal } = useModal();
+
+    const handleRenameProject = () => {
+        setShowMenu(false);
+        openModal("renameProject");
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -41,7 +48,7 @@ const ProjectBox = ({title, description}) => {
                     </button>
                     {showMenu && (
                         <div className={styles["dropdown-menu"]}>
-                            <button className={styles["menu-item"]}>
+                            <button className={styles["menu-item"]} onClick={handleRenameProject}>
                                 <PencilSimpleIcon size={16}/>
                                 Rename
                             </button>

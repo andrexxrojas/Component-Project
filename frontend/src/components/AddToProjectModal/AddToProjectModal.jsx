@@ -1,7 +1,7 @@
 import styles from "./AddToProjectModal.module.css";
 import {CaretDownIcon, XIcon} from "@phosphor-icons/react";
 
-export default function AddToProjectModal() {
+export default function AddToProjectModal({onClose}) {
     return (
         <div className={styles["modal-wrapper"]}>
             <div className={styles["modal-container"]}>
@@ -33,7 +33,7 @@ export default function AddToProjectModal() {
                         Add to Project
                     </button>
                 </div>
-                <button className={styles["close-btn"]}>
+                <button className={styles["close-btn"]} onClick={onClose}>
                     <XIcon size={16} weight="bold"/>
                 </button>
             </div>

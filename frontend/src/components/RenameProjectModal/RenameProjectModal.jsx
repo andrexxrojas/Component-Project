@@ -1,14 +1,14 @@
-import styles from "./ProjectModal.module.css";
+import styles from "./RenameProjectModal.module.css";
 import {XIcon} from "@phosphor-icons/react";
 
-export default function ProjectModal({onClose}) {
+export default function RenameProjectModal({onClose}) {
     return (
         <div className={styles["modal-wrapper"]}>
             <div className={styles["modal-container"]}>
                 <div className={styles["modal-info"]}>
-                    <h4 className={styles["modal-title"]}>Create New Project</h4>
+                    <h4 className={styles["modal-title"]}>Rename Project</h4>
                     <p className={styles["modal-subtitle"]}>
-                        Give your project a name and description to get started.
+                        Enter a new name and description for your project.
                     </p>
                 </div>
                 <div className={styles["modal-form"]}>
@@ -33,7 +33,7 @@ export default function ProjectModal({onClose}) {
                             Cancel
                         </button>
                         <button className={`${styles["btn"]} ${styles["add"]}`}>
-                            Create Project
+                            Save Changes
                         </button>
                     </div>
                     <button className={styles["close-btn"]} onClick={onClose}>

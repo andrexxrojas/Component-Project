@@ -1,7 +1,14 @@
 import styles from "./AuthenticatedNav.module.css";
 import {MagnifyingGlassIcon, PlusIcon} from "@phosphor-icons/react";
+import {useModal} from "../../context/ModalContext.jsx";
 
 export default function AuthenticatedNav() {
+    const { openModal } = useModal();
+
+    const handleNewProject = () => {
+        openModal("createProject");
+    }
+
     return (
         <div className={styles["nav-wrapper"]}>
             <nav className={styles["nav-container"]}>
@@ -17,7 +24,7 @@ export default function AuthenticatedNav() {
                             placeholder="Search..."
                         />
                     </div>
-                    <button className={styles["btn"]}>
+                    <button className={styles["btn"]} onClick={handleNewProject}>
                         <PlusIcon size={16}/>
                         <span className={styles["btn-txt"]}>New project</span>
                     </button>
