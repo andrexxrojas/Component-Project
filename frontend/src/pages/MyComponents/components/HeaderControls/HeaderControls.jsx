@@ -18,9 +18,9 @@ export default function HeaderControls() {
                 </p>
             </div>
             <div className={styles["header-controls"]}>
-                <button className={styles["btn"]}>
+                <button className={styles["btn"]} onClick={handleNewComponent}>
                     <PlusIcon size={16}/>
-                    <span className={styles["btn-txt"]} onClick={handleNewComponent}>
+                    <span className={styles["btn-txt"]}>
                         New Component
                     </span>
                 </button>
