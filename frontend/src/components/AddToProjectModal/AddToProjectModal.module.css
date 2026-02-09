@@ -1,0 +1,124 @@
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.modal-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.modal-title {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-sm);
+}
+
+.modal-subtitle {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-base);
+    color: var(--neutral-400);
+}
+
+.modal-form {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-family: var(--font-medium);
+    font-size: var(--font-size-base);
+    margin-bottom: 0.5rem;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.select-input {
+    width: 100%;
+    padding: 1rem;
+    font-size: var(--font-size-xs);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: white;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    color: #333;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #666;
+    font-size: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.btn {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xs);
+    padding: var(--small-btn-padding);
+    border-radius: var(--small-btn-radius);
+    outline: none;
+    border: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.btn.cancel {
+    background-color: transparent;
+}
+
+.btn.add {
+    background-color: var(--neutral-50);
+}
+
+.close-btn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.2rem;
+    border-radius: 0.2rem;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    user-select: none;
+    cursor: pointer;
+}

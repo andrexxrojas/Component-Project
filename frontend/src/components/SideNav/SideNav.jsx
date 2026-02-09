@@ -34,7 +34,7 @@ export default function SideNav() {
                 <button className={styles["account-container"]}>
                     <div className={styles["account-info"]}>
                         <span>Alex Developer</span>
-                        <small>Free Plan</small>
+                        <small>Account</small>
                     </div>
                     <SignOutIcon size={16} className={styles["logout-icon"]}/>
                 </button>

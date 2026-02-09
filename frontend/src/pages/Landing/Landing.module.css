@@ -28,7 +28,7 @@
 
 .btn {
     font-family: var(--font-medium);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     padding: var(--large-btn-padding);
     border-radius: var(--large-btn-radius);
     display: flex;

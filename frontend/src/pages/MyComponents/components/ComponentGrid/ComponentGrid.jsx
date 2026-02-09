@@ -1,5 +1,12 @@
 import styles from "./ComponentGrid.module.css";
-import {CodeIcon, CopySimpleIcon, DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon} from "@phosphor-icons/react";
+import {
+    CodeIcon,
+    CopySimpleIcon,
+    DotsThreeVerticalIcon,
+    FolderSimplePlusIcon,
+    PencilSimpleIcon,
+    TrashIcon
+} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 
 const ComponentBox = ({title, preview}) => {
@@ -38,6 +45,10 @@ const ComponentBox = ({title, preview}) => {
                             <button className={styles["menu-item"]}>
                                 <PencilSimpleIcon size={16}/>
                                 Rename
+                            </button>
+                            <button className={styles["menu-item"]}>
+                                <FolderSimplePlusIcon size={16}/>
+                                Add to project
                             </button>
                             <button className={styles["menu-item"]}>
                                 <CopySimpleIcon size={16}/>
