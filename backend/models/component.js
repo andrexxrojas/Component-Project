@@ -1,0 +1,26 @@
+import mongoose from "mongoose";
+
+const componentSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        title: {type: String, required: true},
+        files: {
+            html: {type: String, required: true},
+            css: {type: String, required: true},
+            js: {type: String, required: true},
+        },
+        visibility: {
+            type: String,
+            enum: ["public", "private"],
+            default: "public",
+        },
+        imageUrl: {type: String, default: null},
+    },
+    {timestamps: true}
+);
+
+export default mongoose.model("Component", componentSchema);
