@@ -34,7 +34,11 @@ const ComponentBox = ({component, onRename, onDelete}) => {
         onDelete(component._id);
     }
 
-    const handleNavigate = () => {
+    const handleNavigate = (e) => {
+        if (e.target.closest(`.${styles["menu-btn"]}`) ||
+            e.target.closest(`.${styles["dropdown-menu"]}`)) {
+            return;
+        }
         navigate(`/editor/${component._id}`);
     }
 
