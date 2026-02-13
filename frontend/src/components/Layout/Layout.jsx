@@ -1,5 +1,5 @@
 import styles from "./Layout.module.css";
-import {AuthProvider} from "../../context/AuthContext.jsx";
+import {AuthProvider} from "../../context/AuthContext/AuthContext.jsx";
 import {ModalProvider} from "../../context/ModalContext.jsx";
 import ModalManager from "../ModalManager/ModalManager.jsx";
 
