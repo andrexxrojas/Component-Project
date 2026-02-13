@@ -1,7 +1,40 @@
 import styles from "./ProjectModal.module.css";
 import {XIcon} from "@phosphor-icons/react";
+import {CreateProject} from "./services/project.service.js";
+import {useState} from "react";
 
-export default function ProjectModal({onClose}) {
+export default function ProjectModal({ onClose, onProjectCreated }) {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!title.trim()) {
+            setError("Project name is required");
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+
+        try {
+            const response = await CreateProject(title, description);
+
+            if (onProjectCreated) {
+                onProjectCreated(response.project);
+            }
+
+            onClose();
+        } catch (err) {
+            setError(err.message || "Failed to create project");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className={styles["modal-wrapper"]}>
             <div className={styles["modal-container"]}>
@@ -11,36 +44,65 @@ export default function ProjectModal({onClose}) {
                         Give your project a name and description to get started.
                     </p>
                 </div>
-                <div className={styles["modal-form"]}>
+
+                {error && (
+                    <div className={styles["error-message"]}>
+                        {error}
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className={styles["modal-form"]}>
                     <div className={styles["form-group"]}>
                         <label className={styles["form-label"]}>Project Name</label>
                         <input
                             type="text"
                             className={styles["form-input"]}
                             placeholder="Enter your project name..."
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            disabled={loading}
+                            autoFocus
+                            required
                         />
                     </div>
                     <div className={styles["form-group"]}>
                         <label className={styles["form-label"]}>Description (Optional)</label>
-                        <input
-                            type="text"
+                        <textarea
                             className={styles["form-input"]}
                             placeholder="Enter your project description..."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            disabled={loading}
+                            rows={3}
                         />
                     </div>
                     <div className={styles["modal-actions"]}>
-                        <button className={`${styles["btn"]} ${styles["cancel"]}`}>
+                        <button
+                            type="button"
+                            className={`${styles["btn"]} ${styles["cancel"]}`}
+                            onClick={onClose}
+                            disabled={loading}
+                        >
                             Cancel
                         </button>
-                        <button className={`${styles["btn"]} ${styles["add"]}`}>
-                            Create Project
+                        <button
+                            type="submit"
+                            className={`${styles["btn"]} ${styles["add"]}`}
+                            disabled={loading}
+                        >
+                            {loading ? "Creating..." : "Create Project"}
                         </button>
                     </div>
-                    <button className={styles["close-btn"]} onClick={onClose}>
-                        <XIcon size={16} weight="bold"/>
-                    </button>
-                </div>
+                </form>
+
+                <button
+                    className={styles["close-btn"]}
+                    onClick={onClose}
+                    disabled={loading}
+                >
+                    <XIcon size={16} weight="bold"/>
+                </button>
             </div>
         </div>
-    )
+    );
 }

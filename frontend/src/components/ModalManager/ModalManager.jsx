@@ -11,15 +11,30 @@ export default function ModalManager() {
     const renderModal = () => {
         switch (modalState.type) {
             case 'addToProject':
-                return <AddToProjectModal onClose={closeModal}/>;
+                return <AddToProjectModal
+                    onClose={closeModal}
+                    {...modalState.props}
+                />;
             case 'createProject':
-                return <ProjectModal onClose={closeModal}/>;
+                return <ProjectModal
+                    onClose={closeModal}
+                    {...modalState.props}
+                />;
             case "createComponent":
-                return <ComponentModal onClose={closeModal}/>;
+                return <ComponentModal
+                    onClose={closeModal}
+                    {...modalState.props}
+                />;
             case "renameProject":
-                return <RenameProjectModal onClose={closeModal}/>;
+                return <RenameProjectModal
+                    onClose={closeModal}
+                    {...modalState.props}
+                />;
             case "renameComponent":
-                return <RenameComponentModal onClose={closeModal}/>;
+                return <RenameComponentModal
+                    onClose={closeModal}
+                    {...modalState.props}
+                />;
             default:
                 return null;
         }

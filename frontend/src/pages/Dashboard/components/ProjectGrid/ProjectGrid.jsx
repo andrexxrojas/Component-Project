@@ -8,15 +8,26 @@ import {
 } from "@phosphor-icons/react";
 import {useState, useEffect, useRef} from "react";
 import {useModal} from "../../../../context/ModalContext.jsx";
+import {DeleteProject} from "../../services/project.service.js";
 
-const ProjectBox = ({title, description}) => {
+const ProjectBox = ({project, onRename, onDuplicate, onDelete}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
     const { openModal } = useModal();
 
     const handleRenameProject = () => {
         setShowMenu(false);
-        openModal("renameProject");
+        onRename(project);
+    }
+
+    const handleDuplicateProject = () => {
+        setShowMenu(false);
+        onDuplicate(project);
+    }
+
+    const handleDeleteProject = () => {
+        setShowMenu(false);
+        onDelete(project._id);
     }
 
     useEffect(() => {
@@ -52,11 +63,14 @@ const ProjectBox = ({title, description}) => {
                                 <PencilSimpleIcon size={16}/>
                                 Rename
                             </button>
-                            <button className={styles["menu-item"]}>
+                            <button className={styles["menu-item"]} onClick={handleDuplicateProject}>
                                 <CopySimpleIcon size={16}/>
                                 Duplicate
                             </button>
-                            <button className={`${styles["menu-item"]} ${styles["warning"]}`}>
+                            <button
+                                className={`${styles["menu-item"]} ${styles["warning"]}`}
+                                onClick={handleDeleteProject}
+                            >
                                 <TrashIcon size={16}/>
                                 Delete
                             </button>
@@ -65,32 +79,61 @@ const ProjectBox = ({title, description}) => {
                 </div>
             </div>
             <div className={styles["project-info"]}>
-                <h4 className={styles["project-title"]}>{title}</h4>
-                <p className={styles["project-subtitle"]}>{description}</p>
+                <h4 className={styles["project-title"]}>{project.title}</h4>
+                <p className={styles["project-subtitle"]}>
+                    {project.description || "No description provided"}
+                </p>
             </div>
         </div>
     )
 }
 
-export default function ProjectGrid() {
+export default function ProjectGrid({ projects = [], onProjectUpdated, onProjectDeleted }) {
+    const { openModal } = useModal();
+
+    const handleRename = (project) => {
+        openModal("renameProject", {
+            project,
+            onProjectUpdated
+        });
+    };
+
+    const handleDuplicate = (project) => {
+        openModal("duplicateProject", {
+            project,
+            onProjectCreated: (newProject) => {
+                if (onProjectUpdated) onProjectUpdated(newProject);
+            }
+        });
+    };
+
+    const handleDelete = async (projectId) => {
+        try {
+            await DeleteProject(projectId);
+            onProjectDeleted(projectId);
+        } catch (error) {
+            console.error("Failed to delete project", error);
+        }
+    };
+
     return (
         <div className={styles['grid-container']}>
-            <ProjectBox
-                title="E-Commerce UI Kit"
-                description="A collection of modern cards and layouts for online stores"
-            />
-            <ProjectBox
-                title="Dashboard Widgets"
-                description="Charts, stats cards, and table layouts."
-            />
-            <ProjectBox
-                title="Landing Page Hero"
-                description="High conversion hero sections."
-            />
-            <ProjectBox
-                title="Auth Forms"
-                description="Login, Signup, and Forgot Password templates."
-            />
+            {projects.length > 0 ? (
+                projects.map((project) => (
+                    <ProjectBox
+                        key={project._id}
+                        project={project}
+                        onRename={handleRename}
+                        onDuplicate={handleDuplicate}
+                        onDelete={handleDelete}
+                    />
+                ))
+            ) : (
+                // Optional: Show a message when no projects exist
+                <div className={styles['no-projects']}>
+                    No projects yet. Create your first project!
+                </div>
+            )}
         </div>
-    )
+    );
 }

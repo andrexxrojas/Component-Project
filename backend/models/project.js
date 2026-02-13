@@ -11,6 +11,10 @@ const projectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        description: {
+            type: String,
+            default: "",
+        },
         components: [
             {
                 type: mongoose.Schema.Types.ObjectId,

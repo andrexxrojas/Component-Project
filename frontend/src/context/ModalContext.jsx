@@ -6,14 +6,14 @@ export function ModalProvider({ children }) {
     const [modalState, setModalState] = useState({
         isOpen: false,
         type: null,
-        data: null,
+        props: null,
     });
 
-    const openModal = (type, data = null) => {
+    const openModal = (type, props = null) => {
         setModalState({
             isOpen: true,
             type,
-            data,
+            props,
         });
     };
 
@@ -21,7 +21,7 @@ export function ModalProvider({ children }) {
         setModalState({
             isOpen: false,
             type: null,
-            data: null,
+            props: null,
         });
     };
 

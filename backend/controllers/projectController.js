@@ -3,11 +3,12 @@ import Project from "../models/project.js";
 // [POST] Create new project
 export const newProject = async (req, res) => {
     try {
-        const {title, components, visibility} = req.body;
+        const {title, description, components, visibility} = req.body;
 
         const newProject = new Project({
             userId: req.user.id,
             title,
+            description: description || "",
             components: components || [],
             visibility: visibility || "public",
         });
@@ -22,11 +23,16 @@ export const newProject = async (req, res) => {
 // [PUT] Update existing project
 export const updateProject = async (req, res) => {
     try {
-        const {id, title, visibility} = req.body;
+        const {id, title, description, visibility} = req.body;
+
+        const updateFields = {};
+        if (title !== undefined) updateFields.title = title;
+        if (description !== undefined) updateFields.description = description;
+        if (visibility !== undefined) updateFields.visibility = visibility;
 
         const updated = await Project.findOneAndUpdate(
             {_id: id, userId: req.user.id},
-            {title, visibility},
+            updateFields,
             {new: true}
         );
 
@@ -105,7 +111,6 @@ export const addComponentToProject = async (req, res) => {
         }
 
         project.componentCount = project.components.length;
-
         await project.save();
 
         res.status(200).json({message: "Component added", project});
