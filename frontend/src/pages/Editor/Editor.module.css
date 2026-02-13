@@ -1,0 +1,24 @@
+.editor-page {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.editors-grid {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+}
+
+.preview-section {
+    width: 50%;
+    min-width: 400px;
+    height: 100%;
+    border-left: 1px solid var(--neutral-200, #e5e7eb);
+}
+
+.editor-container {
+    height: calc(100vh - 5rem);
+}

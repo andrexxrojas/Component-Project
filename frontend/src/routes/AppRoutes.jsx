@@ -40,7 +40,7 @@ export default function AppRoutes() {
                         <ProjectView />
                     </ProtectedRoute>
                 }/>
-                <Route path="/editor/:projectId/:componentId" element={
+                <Route path="/editor/:componentId" element={
                     <ProtectedRoute>
                         <Editor />
                     </ProtectedRoute>

@@ -1,7 +1,6 @@
 import styles from "./ComponentGrid.module.css";
 import {
     CodeIcon,
-    CopySimpleIcon,
     DotsThreeVerticalIcon,
     FolderSimplePlusIcon,
     PencilSimpleIcon,
@@ -10,11 +9,13 @@ import {
 import {useEffect, useRef, useState} from "react";
 import {useModal} from "../../../../context/ModalContext.jsx";
 import {DeleteComponent} from "../../services/component.service.js";
+import {useNavigate} from "react-router-dom";
 
 const ComponentBox = ({component, onRename, onDelete}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
     const { openModal } = useModal();
+    const navigate = useNavigate();
 
     const handleAddToProject = () => {
         setShowMenu(false);
@@ -33,6 +34,10 @@ const ComponentBox = ({component, onRename, onDelete}) => {
         onDelete(component._id);
     }
 
+    const handleNavigate = () => {
+        navigate(`/editor/${component._id}`);
+    }
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (showMenu && menuRef.current && !menuRef.current.contains(event.target)) {
@@ -48,7 +53,7 @@ const ComponentBox = ({component, onRename, onDelete}) => {
     }, [showMenu]);
 
     return (
-        <div className={styles["component-box"]}>
+        <div className={styles["component-box"]} onClick={handleNavigate}>
             <div className={styles["component-header"]}>
                 <div className={styles["logo-container"]}>
                     <CodeIcon size={24}/>
