@@ -28,7 +28,8 @@ export default function ModalManager() {
             case "renameProject":
                 return <RenameProjectModal
                     onClose={closeModal}
-                    {...modalState.props}
+                    project={modalState.props?.project}
+                    onProjectUpdated={modalState.props?.onProjectUpdated}
                 />;
             case "renameComponent":
                 return <RenameComponentModal
