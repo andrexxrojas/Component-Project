@@ -54,7 +54,6 @@ export function AuthProvider({ children }) {
         })
         .catch((error) => {
           console.error("Logout failed:", error);
-          // Still clear local state even if API fails
           setIsLoggedIn(false);
           navigate("/");
           throw error;
