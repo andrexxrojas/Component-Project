@@ -41,7 +41,7 @@ export default function Dashboard() {
 
     return (
         <div className={styles["dashboard-wrapper"]}>
-            <AuthenticatedNav />
+            <AuthenticatedNav onProjectCreated={handleProjectCreated}/>
             <SideNavWrapper>
                 <HeaderControls onProjectCreated={handleProjectCreated} />
                 <ProjectGrid

@@ -2,11 +2,13 @@ import styles from "./AuthenticatedNav.module.css";
 import {MagnifyingGlassIcon, PlusIcon} from "@phosphor-icons/react";
 import {useModal} from "../../context/ModalContext.jsx";
 
-export default function AuthenticatedNav() {
+export default function AuthenticatedNav({ onProjectCreated }) {
     const { openModal } = useModal();
 
     const handleNewProject = () => {
-        openModal("createProject");
+        openModal("createProject", {
+            onProjectCreated
+        });
     }
 
     return (
