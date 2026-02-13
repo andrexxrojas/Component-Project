@@ -1,29 +1,41 @@
 import styles from "./Auth.module.css";
-import {useState, useEffect} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState(''); // Changed from email to username
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const { login, loading } = useAuth();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log({ email, password });
+        setError('');
+
+        try {
+            await login(username, password);
+        } catch (err) {
+            setError(err.message || 'Failed to login. Please try again.');
+        }
     };
 
     return (
         <form onSubmit={handleSubmit} className={styles["login-form"]}>
+            {error && <div className={styles["error-message"]}>{error}</div>}
+
             <div className={styles["form-group"]}>
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="username">Username</label>
                 <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    autoComplete="email"
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="johndoe"
+                    autoComplete="username"
                     required
                     autoFocus
+                    disabled={loading}
                 />
             </div>
 
@@ -38,11 +50,16 @@ const LoginForm = () => {
                     autoComplete="current-password"
                     required
                     minLength={6}
+                    disabled={loading}
                 />
             </div>
 
-            <button type="submit" className={styles["submit-btn"]}>
-                Log In
+            <button
+                type="submit"
+                className={styles["submit-btn"]}
+                disabled={loading}
+            >
+                {loading ? 'Logging in...' : 'Log In'}
             </button>
         </form>
     );
@@ -50,15 +67,33 @@ const LoginForm = () => {
 
 const SignupForm = () => {
     const [formData, setFormData] = useState({
-        fullName: '',
+        username: '',
         email: '',
         password: '',
         confirmPassword: ''
     });
+    const [error, setError] = useState('');
+    const { signup, loading } = useAuth();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
+        setError('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError('Password must be at least 6 characters');
+            return;
+        }
+
+        try {
+            await signup(formData.username, formData.email, formData.password);
+        } catch (err) {
+            setError(err.message || 'Failed to create account. Please try again.');
+        }
     };
 
     const handleChange = (e) => {
@@ -71,17 +106,20 @@ const SignupForm = () => {
 
     return (
         <form onSubmit={handleSubmit} className={styles["signup-form"]}>
+            {error && <div className={styles["error-message"]}>{error}</div>}
+
             <div className={styles["form-group"]}>
-                <label htmlFor="fullName">Full Name</label>
+                <label htmlFor="username">Username</label>
                 <input
                     type="text"
-                    id="fullName"
-                    value={formData.fullName}
+                    id="username"
+                    value={formData.username}
                     onChange={handleChange}
-                    placeholder="John Doe"
-                    autoComplete="name"
+                    placeholder="johndoe"
+                    autoComplete="username"
                     required
                     autoFocus
+                    disabled={loading}
                 />
             </div>
 
@@ -95,6 +133,7 @@ const SignupForm = () => {
                     placeholder="you@example.com"
                     autoComplete="email"
                     required
+                    disabled={loading}
                 />
             </div>
 
@@ -109,6 +148,7 @@ const SignupForm = () => {
                     autoComplete="new-password"
                     required
                     minLength={6}
+                    disabled={loading}
                 />
             </div>
 
@@ -122,19 +162,32 @@ const SignupForm = () => {
                     placeholder="••••••••"
                     autoComplete="new-password"
                     required
+                    disabled={loading}
                 />
             </div>
 
-            <button type="submit" className={styles["submit-btn"]}>
-                Create Account
+            <button
+                type="submit"
+                className={styles["submit-btn"]}
+                disabled={loading}
+            >
+                {loading ? 'Creating Account...' : 'Create Account'}
             </button>
         </form>
     );
-}
+};
 
 export default function Auth() {
     const [activeTab, setActiveTab] = useState("login");
     const [searchParams] = useSearchParams();
+    const { isLoggedIn, loading } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!loading && isLoggedIn) {
+            navigate('/dashboard');
+        }
+    }, [isLoggedIn, loading, navigate]);
 
     useEffect(() => {
         const tab = searchParams.get('type');
@@ -142,6 +195,16 @@ export default function Auth() {
             setActiveTab(tab);
         }
     }, [searchParams]);
+
+    if (loading) {
+        return (
+            <div className={styles["auth-wrapper"]}>
+                <div className={styles["auth-container"]}>
+                    <div className={styles["loading-state"]}>Loading...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles["auth-wrapper"]}>
@@ -166,8 +229,8 @@ export default function Auth() {
                         <span className={styles["tab-btn-txt"]}>Sign Up</span>
                     </button>
                 </div>
-                {activeTab === "login" ? (<LoginForm />) : (<SignupForm/>)}
+                {activeTab === "login" ? <LoginForm /> : <SignupForm />}
             </div>
         </div>
-    )
+    );
 }

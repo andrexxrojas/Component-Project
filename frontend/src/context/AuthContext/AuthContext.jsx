@@ -13,9 +13,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        const data = await CheckAuth();
-        setIsLoggedIn(data.loggedIn === true);
-        setUser(data.user || null);
+          const data = await CheckAuth();
+          setIsLoggedIn(data.loggedIn === true);
+          setUser(data.user || null);
       } catch (error) {
         setIsLoggedIn(false);
         setUser(null);
@@ -31,8 +31,9 @@ export function AuthProvider({ children }) {
     setLoading(true);
 
     Login(username, password)
-        .then(() => {
+        .then((data) => {
           setIsLoggedIn(true);
+          setUser(data.user);
           navigate("/dashboard");
         })
         .catch((error) => {
@@ -63,25 +64,26 @@ export function AuthProvider({ children }) {
         });
   };
 
-  const signup = (username, email, password) => {
-    setLoading(true);
+    const signup = (username, email, password) => {
+        setLoading(true);
 
-    Signup(username, email, password)
-        .then(() => {
-          setIsLoggedIn(true);
-          navigate("/dashboard");
-        })
-        .catch((error) => {
-          console.error("Signup failed:", error);
-          throw error;
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-  };
+        Signup(username, email, password)
+            .then((data) => {
+                setIsLoggedIn(true);
+                setUser(data.user);
+                navigate("/dashboard");
+            })
+            .catch((error) => {
+                console.error("Signup failed:", error);
+                throw error;
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
 
   return (
-      <AuthContext.Provider value={{ isLoggedIn, loading, login, logout, signup }}>
+      <AuthContext.Provider value={{ isLoggedIn, loading, login, logout, signup, user }}>
         {children}
       </AuthContext.Provider>
   );
