@@ -9,26 +9,29 @@ import {
 import {useState, useEffect, useRef} from "react";
 import {useModal} from "../../../../context/ModalContext.jsx";
 import {DeleteProject} from "../../services/project.service.js";
+import {useNavigate} from "react-router-dom";
 
-const ProjectBox = ({project, onRename, onDuplicate, onDelete}) => {
+const ProjectBox = ({project, onRename, onDelete}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
-    const { openModal } = useModal();
+    const navigate = useNavigate();
 
     const handleRenameProject = () => {
         setShowMenu(false);
         onRename(project);
     }
 
-    const handleDuplicateProject = () => {
-        setShowMenu(false);
-        onDuplicate(project);
-    }
-
     const handleDeleteProject = () => {
         setShowMenu(false);
         onDelete(project._id);
     }
+
+    const handleProjectClick = (e) => {
+        if (e.target.closest(`.${styles["menu-anchor"]}`)) {
+            return;
+        }
+        navigate(`/projects/${project._id}`);
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -45,7 +48,7 @@ const ProjectBox = ({project, onRename, onDuplicate, onDelete}) => {
     }, [showMenu]);
 
     return (
-        <div className={styles["project-box"]}>
+        <div className={styles["project-box"]} onClick={handleProjectClick}>
             <div className={styles["project-header"]}>
                 <div className={styles["logo-container"]}>
                     <FolderSimpleIcon size={24}/>
@@ -62,10 +65,6 @@ const ProjectBox = ({project, onRename, onDuplicate, onDelete}) => {
                             <button className={styles["menu-item"]} onClick={handleRenameProject}>
                                 <PencilSimpleIcon size={16}/>
                                 Rename
-                            </button>
-                            <button className={styles["menu-item"]} onClick={handleDuplicateProject}>
-                                <CopySimpleIcon size={16}/>
-                                Duplicate
                             </button>
                             <button
                                 className={`${styles["menu-item"]} ${styles["warning"]}`}
@@ -98,21 +97,12 @@ export default function ProjectGrid({ projects = [], onProjectUpdated, onProject
         });
     };
 
-    const handleDuplicate = (project) => {
-        openModal("duplicateProject", {
-            project,
-            onProjectCreated: (newProject) => {
-                if (onProjectUpdated) onProjectUpdated(newProject);
-            }
-        });
-    };
-
     const handleDelete = async (projectId) => {
         try {
             await DeleteProject(projectId);
             onProjectDeleted(projectId);
         } catch (error) {
-            console.error("Failed to delete project", error);
+            console.error("Failed to delete project:", error);
         }
     };
 
@@ -124,13 +114,11 @@ export default function ProjectGrid({ projects = [], onProjectUpdated, onProject
                         key={project._id}
                         project={project}
                         onRename={handleRename}
-                        onDuplicate={handleDuplicate}
                         onDelete={handleDelete}
                     />
                 ))
             ) : (
-                // Optional: Show a message when no projects exist
-                <div className={styles['no-projects']}>
+                <div className={styles['empty-txt']}>
                     No projects yet. Create your first project!
                 </div>
             )}

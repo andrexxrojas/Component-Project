@@ -1,10 +1,22 @@
 import styles from "./ComponentGrid.module.css";
 import {CodeIcon, CopySimpleIcon, DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
+import {useModal} from "../../../../context/ModalContext.jsx";
+import {DeleteComponent} from "../../services/project.service.js";
 
-const ComponentBox = ({title, preview}) => {
+const ComponentBox = ({component, onRename, onDelete}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
+
+    const handleRename = () => {
+        setShowMenu(false);
+        onRename(component);
+    }
+
+    const handleDelete = () => {
+        setShowMenu(false);
+        onDelete(component._id);
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -35,15 +47,14 @@ const ComponentBox = ({title, preview}) => {
                     </button>
                     {showMenu && (
                         <div className={styles["dropdown-menu"]}>
-                            <button className={styles["menu-item"]}>
+                            <button className={styles["menu-item"]} onClick={handleRename}>
                                 <PencilSimpleIcon size={16}/>
                                 Rename
                             </button>
-                            <button className={styles["menu-item"]}>
-                                <CopySimpleIcon size={16}/>
-                                Duplicate
-                            </button>
-                            <button className={`${styles["menu-item"]} ${styles["warning"]}`}>
+                            <button
+                                className={`${styles["menu-item"]} ${styles["warning"]}`}
+                                onClick={handleDelete}
+                            >
                                 <TrashIcon size={16}/>
                                 Delete
                             </button>
@@ -52,10 +63,10 @@ const ComponentBox = ({title, preview}) => {
                 </div>
             </div>
             <div className={styles["component-info"]}>
-                <h4 className={styles["component-title"]}>{title}</h4>
+                <h4 className={styles["component-title"]}>{component.title}</h4>
                 <div className={styles["preview-container"]}>
-                    {preview ? (
-                        <img src={preview} alt="component preview image"/>
+                    {component.preview === "" ? (
+                        <img src={component.preview} alt="component preview image"/>
                     ) : (
                         <span className={styles["empty-preview-txt"]}>Empty Preview</span>
                     )}
@@ -65,13 +76,35 @@ const ComponentBox = ({title, preview}) => {
     )
 }
 
-export default function ComponentGrid() {
+export default function ComponentGrid({ components = [], onComponentUpdated, onComponentDeleted }) {
+    const { openModal } = useModal();
+
+    const handleRename = (component) => {
+        openModal("renameComponent", {
+            component,
+            onComponentUpdated,
+        })
+    }
+
+    const handleDelete = async (componentId) => {
+        try {
+            await DeleteComponent(componentId);
+            onComponentDeleted(componentId);
+        } catch (error) {
+            console.error("Failed to delete component:", error);
+        }
+    }
+
     return (
         <div className={styles["grid-container"]}>
-            <ComponentBox
-                title="Product Card"
-                preview=""
-            />
+            {components.map((component) => (
+                <ComponentBox
+                    key={component._id}
+                    component={component}
+                    onRename={handleRename}
+                    onDelete={handleDelete}
+                />
+            ))}
         </div>
     )
 }

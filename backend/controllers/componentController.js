@@ -43,7 +43,6 @@ export const newComponent = async (req, res) => {
     }
 };
 
-
 // [PUT] Save (update) existing component
 export const saveComponent = async (req, res) => {
     try {

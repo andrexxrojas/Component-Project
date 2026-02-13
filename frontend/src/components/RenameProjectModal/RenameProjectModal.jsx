@@ -13,6 +13,7 @@ export default function RenameProjectModal({ onClose, project, onProjectUpdated 
 
         if (!title.trim()) return;
         setLoading(true);
+
         try {
             const res = await UpdateProject(
                 project._id,
@@ -26,7 +27,7 @@ export default function RenameProjectModal({ onClose, project, onProjectUpdated 
 
             onClose();
         } catch (error) {
-            console.error("Failed to update project", error);
+            console.error("Failed to update project:", error);
         } finally {
             setLoading(false);
         }

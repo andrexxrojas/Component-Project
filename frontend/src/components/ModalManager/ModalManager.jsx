@@ -13,7 +13,7 @@ export default function ModalManager() {
             case 'addToProject':
                 return <AddToProjectModal
                     onClose={closeModal}
-                    {...modalState.props}
+                    component={modalState.props?.component}
                 />;
             case 'createProject':
                 return <ProjectModal
@@ -34,7 +34,8 @@ export default function ModalManager() {
             case "renameComponent":
                 return <RenameComponentModal
                     onClose={closeModal}
-                    {...modalState.props}
+                    component={modalState.props?.component}
+                    onComponentUpdated={modalState.props?.onComponentUpdated}
                 />;
             default:
                 return null;

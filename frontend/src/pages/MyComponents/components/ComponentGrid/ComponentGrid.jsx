@@ -9,20 +9,28 @@ import {
 } from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 import {useModal} from "../../../../context/ModalContext.jsx";
+import {DeleteComponent} from "../../services/component.service.js";
 
-const ComponentBox = ({title, preview}) => {
+const ComponentBox = ({component, onRename, onDelete}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
     const { openModal } = useModal();
 
     const handleAddToProject = () => {
         setShowMenu(false);
-        openModal("addToProject");
+        openModal("addToProject", {
+            component
+        });
     }
 
     const handleRename = () => {
         setShowMenu(false);
-        openModal("renameComponent");
+        onRename(component);
+    }
+
+    const handleDelete = () => {
+        setShowMenu(false);
+        onDelete(component._id);
     }
 
     useEffect(() => {
@@ -62,11 +70,10 @@ const ComponentBox = ({title, preview}) => {
                                 <FolderSimplePlusIcon size={16}/>
                                 Add to project
                             </button>
-                            <button className={styles["menu-item"]}>
-                                <CopySimpleIcon size={16}/>
-                                Duplicate
-                            </button>
-                            <button className={`${styles["menu-item"]} ${styles["warning"]}`}>
+                            <button
+                                className={`${styles["menu-item"]} ${styles["warning"]}`}
+                                onClick={handleDelete}
+                            >
                                 <TrashIcon size={16}/>
                                 Delete
                             </button>
@@ -75,10 +82,10 @@ const ComponentBox = ({title, preview}) => {
                 </div>
             </div>
             <div className={styles["component-info"]}>
-                <h4 className={styles["component-title"]}>{title}</h4>
+                <h4 className={styles["component-title"]}>{component.title}</h4>
                 <div className={styles["preview-container"]}>
-                    {preview ? (
-                        <img src={preview} alt="component preview image"/>
+                    {component.preview ? (
+                        <img src={component.preview} alt="component preview image"/>
                     ) : (
                         <span className={styles["empty-preview-txt"]}>Empty Preview</span>
                     )}
@@ -88,13 +95,42 @@ const ComponentBox = ({title, preview}) => {
     )
 }
 
-export default function ComponentGrid() {
+export default function ComponentGrid({ components = [], onComponentUpdated, onComponentDeleted }) {
+    const { openModal } = useModal();
+
+    const handleRename = (component) => {
+        openModal("renameComponent", {
+            component,
+            onComponentUpdated,
+        })
+    }
+
+    const handleDelete = async (componentId) => {
+        try {
+            await DeleteComponent(componentId);
+            onComponentDeleted(componentId);
+        } catch (error) {
+            console.error("Failed to delete component:", error);
+        }
+    }
+
     return (
         <div className={styles["grid-container"]}>
-            <ComponentBox
-                title="Product Card"
-                preview=""
-            />
+            {components.length > 0 ? (
+                components.map((component) => (
+                    <ComponentBox
+                        key={component._id}
+                        component={component}
+                        title={component.title}
+                        onRename={handleRename}
+                        onDelete={handleDelete}
+                    />
+                ))
+            ) : (
+                <div className={styles['empty-txt']}>
+                    No components yet. Create your first component!
+                </div>
+            )}
         </div>
     )
 }

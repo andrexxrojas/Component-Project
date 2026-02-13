@@ -102,7 +102,7 @@ export const addComponentToProject = async (req, res) => {
 
         const project = await Project.findOneAndUpdate(
             {_id: projectId, userId: req.user.id},
-            {$addToSet: {components: componentId}}, // prevents duplicates
+            {$addToSet: {components: componentId}},
             {new: true}
         ).populate("components");
 

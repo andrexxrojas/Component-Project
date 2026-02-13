@@ -2,11 +2,13 @@ import styles from "./HeaderControls.module.css";
 import {PlusIcon} from "@phosphor-icons/react";
 import {useModal} from "../../../../context/ModalContext.jsx";
 
-export default function HeaderControls() {
+export default function HeaderControls({ onComponentCreated }) {
     const { openModal } = useModal();
 
     const handleNewComponent = () => {
-        openModal("createComponent");
+        openModal("createComponent", {
+            onComponentCreated: onComponentCreated,
+        });
     }
 
     return (

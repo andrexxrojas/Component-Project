@@ -23,21 +23,21 @@ export default function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     const handleProjectCreated = (newProject) => {
         setProjects(prev => [newProject, ...prev]);
-    };
+    }
 
     const handleProjectUpdated = (updatedProject) => {
         setProjects(prev =>
             prev.map(p => p._id === updatedProject._id ? updatedProject : p)
         );
-    };
+    }
 
     const handleProjectDeleted = (deletedId) => {
         setProjects(prev => prev.filter(p => p._id !== deletedId));
-    };
+    }
 
     return (
         <div className={styles["dashboard-wrapper"]}>

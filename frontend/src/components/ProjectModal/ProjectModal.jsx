@@ -7,18 +7,12 @@ export default function ProjectModal({ onClose, onProjectCreated }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!title.trim()) {
-            setError("Project name is required");
-            return;
-        }
-
+        if (!title.trim()) return;
         setLoading(true);
-        setError("");
 
         try {
             const response = await CreateProject(title, description);
@@ -28,8 +22,8 @@ export default function ProjectModal({ onClose, onProjectCreated }) {
             }
 
             onClose();
-        } catch (err) {
-            setError(err.message || "Failed to create project");
+        } catch (error) {
+            console.error("Failed to create project:", error);
         } finally {
             setLoading(false);
         }
@@ -44,13 +38,6 @@ export default function ProjectModal({ onClose, onProjectCreated }) {
                         Give your project a name and description to get started.
                     </p>
                 </div>
-
-                {error && (
-                    <div className={styles["error-message"]}>
-                        {error}
-                    </div>
-                )}
-
                 <form onSubmit={handleSubmit} className={styles["modal-form"]}>
                     <div className={styles["form-group"]}>
                         <label className={styles["form-label"]}>Project Name</label>
