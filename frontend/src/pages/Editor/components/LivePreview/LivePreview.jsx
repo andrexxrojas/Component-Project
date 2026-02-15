@@ -1,9 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styles from "./LivePreview.module.css";
 
 export function LivePreview({ code, css }) {
     const [iframeSrc, setIframeSrc] = useState("");
+    const [debouncedCode, setDebouncedCode] = useState(code);
+    const [debouncedCss, setDebouncedCss] = useState(css);
+    const timeoutRef = useRef(null);
 
+    // Debounce effect
+    useEffect(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            setDebouncedCode(code);
+            setDebouncedCss(css);
+        }, 500);
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [code, css]);
+
+    // Preview effect
     useEffect(() => {
         const combinedCode = `
             <!DOCTYPE html>
@@ -30,22 +52,29 @@ export function LivePreview({ code, css }) {
                             padding: 2rem;
                         }
                         
-                        ${css}
+                        ${debouncedCss}
                     </style>
                 </head>
                 <body>
                     <div id="root"></div>
                     <script type="text/babel">
-                        ${code}
+                        // User's component code
+                        ${debouncedCode}
                         
-                        const rootElement = document.getElementById('root');
-                        const root = ReactDOM.createRoot(rootElement);
+                        // Find the last defined component (function starting with capital letter)
+                        const componentKeys = Object.keys(window).filter(key => 
+                            typeof window[key] === 'function' && 
+                            key[0] === key[0].toUpperCase() &&
+                            !key.includes('React') && 
+                            !key.includes('Promise')
+                        );
                         
-                        // Find the component (assumes last defined component or default export)
-                        const Component = typeof ProductCard !== 'undefined' ? ProductCard : 
-                                        typeof App !== 'undefined' ? App : 
-                                        (() => <div>No component found</div>);
+                        // Use the last component defined (usually the main one)
+                        const Component = componentKeys.length > 0 
+                            ? window[componentKeys[componentKeys.length - 1]]
+                            : () => <div style={{padding: '20px', color: '#666'}}>No component found. Make sure your component name starts with a capital letter.</div>;
                         
+                        const root = ReactDOM.createRoot(document.getElementById('root'));
                         root.render(<Component />);
                     </script>
                 </body>
@@ -59,7 +88,7 @@ export function LivePreview({ code, css }) {
         return () => {
             URL.revokeObjectURL(url);
         };
-    }, [code, css]);
+    }, [debouncedCode, debouncedCss]);
 
     return (
         <div className={styles["preview-wrapper"]}>

@@ -9,7 +9,6 @@ const componentSchema = new mongoose.Schema(
         },
         title: {type: String, required: true},
         files: {
-            html: {type: String, required: true},
             css: {type: String, required: true},
             js: {type: String, required: true},
         },

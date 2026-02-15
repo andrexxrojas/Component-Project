@@ -11,6 +11,7 @@ import styles from "./CodeEditor.module.css";
 
 export function CodeEditor({ code, onChange, language, label }) {
     const getHighlighter = (code) => {
+        if (!code) return;
         if (language === "html") return highlight(code, languages.markup, "markup");
         if (language === "css") return highlight(code, languages.css, "css");
         if (language === "js" || language === "jsx") return highlight(code, languages.jsx || languages.javascript, "jsx");

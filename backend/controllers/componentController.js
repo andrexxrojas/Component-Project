@@ -5,27 +5,28 @@ export const newComponent = async (req, res) => {
     try {
         const {title, files, visibility} = req.body;
 
-        // Ensure files object exists with default template
         const componentFiles = {
-            html: files?.html || `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Sandbox</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div id="app"></div>
-    <script src="script.js"></script>
-  </body>
-</html>`,
-            css: files?.css ?? " ", // empty string by default
-            js: files?.js || `export default function App() {
-  return (
-    <h1>Hello World</h1>
-  )
+            css: files?.css || `.wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16px;
 }`,
+
+            js: files?.js || `const WelcomeMessage = () => {
+  return (
+    <div className="wrapper">
+      <h1 className="title">Hello there!</h1>
+      <p>This is a sample component to get you started.</p>
+    </div>
+  );
+};`,
         };
 
         const newComponent = new Component({
