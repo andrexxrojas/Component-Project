@@ -31,3 +31,23 @@ export const DeleteComponent = async (id) => {
 
     return res.json();
 }
+
+export const RemoveComponentFromProject = async (projectId, componentId) => {
+    const res = await fetch(`${API_URL}/projects/remove-component`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            projectId,
+            componentId
+        })
+    })
+
+    if (!res.ok) {
+        throw new Error("Failed to remove component from project.");
+    }
+
+    return res.json();
+}

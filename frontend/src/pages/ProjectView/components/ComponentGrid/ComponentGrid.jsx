@@ -1,11 +1,17 @@
 import styles from "./ComponentGrid.module.css";
-import {CodeIcon, CopySimpleIcon, DotsThreeVerticalIcon, PencilSimpleIcon, TrashIcon} from "@phosphor-icons/react";
+import {
+    CodeIcon,
+    DotsThreeVerticalIcon,
+    FolderSimpleMinusIcon,
+    PencilSimpleIcon,
+    TrashIcon
+} from "@phosphor-icons/react";
 import {useEffect, useRef, useState} from "react";
 import {useModal} from "../../../../context/ModalContext.jsx";
-import {DeleteComponent} from "../../services/project.service.js";
+import {DeleteComponent, RemoveComponentFromProject} from "../../services/project.service.js";
 import {useNavigate} from "react-router-dom";
 
-const ComponentBox = ({component, onRename, onDelete}) => {
+const ComponentBox = ({component, onRename, onDelete, onRemove}) => {
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -18,6 +24,11 @@ const ComponentBox = ({component, onRename, onDelete}) => {
     const handleDelete = () => {
         setShowMenu(false);
         onDelete(component._id);
+    }
+
+    const handleRemove = () => {
+        setShowMenu(false);
+        onRemove(component._id);
     }
 
     const handleNavigate = (e) => {
@@ -61,6 +72,10 @@ const ComponentBox = ({component, onRename, onDelete}) => {
                                 <PencilSimpleIcon size={16}/>
                                 Rename
                             </button>
+                            <button className={styles["menu-item"]} onClick={handleRemove}>
+                                <FolderSimpleMinusIcon size={16}/>
+                                Remove from Project
+                            </button>
                             <button
                                 className={`${styles["menu-item"]} ${styles["warning"]}`}
                                 onClick={handleDelete}
@@ -86,7 +101,7 @@ const ComponentBox = ({component, onRename, onDelete}) => {
     )
 }
 
-export default function ComponentGrid({ components = [], onComponentUpdated, onComponentDeleted }) {
+export default function ComponentGrid({ components = [], projectId, onComponentUpdated, onComponentDeleted, onComponentRemoved }) {
     const { openModal } = useModal();
 
     const handleRename = (component) => {
@@ -105,6 +120,15 @@ export default function ComponentGrid({ components = [], onComponentUpdated, onC
         }
     }
 
+    const handleRemove = async (componentId) => {
+        try {
+            await RemoveComponentFromProject(projectId, componentId);
+            onComponentRemoved(componentId);
+        } catch (error) {
+            console.error("Failed to remove component:", error);
+        }
+    }
+
     return (
         <div className={styles["grid-container"]}>
             {components.map((component) => (
@@ -113,6 +137,7 @@ export default function ComponentGrid({ components = [], onComponentUpdated, onC
                     component={component}
                     onRename={handleRename}
                     onDelete={handleDelete}
+                    onRemove={handleRemove}
                 />
             ))}
         </div>

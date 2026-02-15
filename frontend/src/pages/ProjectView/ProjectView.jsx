@@ -51,6 +51,13 @@ export default function ProjectView() {
         }));
     };
 
+    const handleComponentRemoved = (removedId) => {
+        setProject(prev => ({
+            ...prev,
+            components: prev.components.filter(c => c._id !== removedId)
+        }));
+    }
+
     if (loading) {
         return (
             <div className={styles["project-view-wrapper"]}>
@@ -74,8 +81,10 @@ export default function ProjectView() {
                 />
                 <ComponentGrid
                     components={project.components || []}
+                    projectId={project._id}
                     onComponentUpdated={handleComponentUpdated}
                     onComponentDeleted={handleComponentDeleted}
+                    onComponentRemoved={handleComponentRemoved}
                 />
             </SideNavWrapper>
         </div>
