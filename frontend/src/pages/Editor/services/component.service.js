@@ -15,3 +15,23 @@ export const GetComponent = async (id) => {
 
     return res.json();
 }
+
+export const SaveComponent = async (id, files) => {
+    const res = await fetch (`${API_URL}/components/save-component`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            id,
+            files: files,
+        })
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to update component");
+    }
+
+    return res.json();
+}

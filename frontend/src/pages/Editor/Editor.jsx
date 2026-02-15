@@ -2,7 +2,7 @@ import styles from "./Editor.module.css";
 import Nav from "./components/Nav/Nav.jsx";
 import EditorGrid from "./components/EditorGrid/EditorGrid.jsx";
 import { useEffect, useState } from "react";
-import { GetComponent } from "./services/component.service.js";
+import { GetComponent, SaveComponent } from "./services/component.service.js";
 import { useParams } from "react-router-dom";
 
 export default function Editor() {
@@ -32,6 +32,20 @@ export default function Editor() {
         }
     }, [id]);
 
+    const saveComponent = async () => {
+        try {
+            const files = {
+                css: css,
+                js: code,
+            }
+
+            const res = await SaveComponent(id, files);
+            console.log(res);
+        } catch (error) {
+            console.error("Failed to save component:", error);
+        }
+    }
+
     if (isLoading) {
         return (
             <div className={styles["editor-wrapper"]}>
@@ -45,7 +59,7 @@ export default function Editor() {
 
     return (
         <div className={styles["editor-wrapper"]}>
-            <Nav title={title}/>
+            <Nav title={title} onSave={saveComponent}/>
             <div className={styles["editor-container"]}>
                 <EditorGrid
                     code={code}
