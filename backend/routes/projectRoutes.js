@@ -5,7 +5,10 @@ import {
     deleteProject,
     getProjects,
     getProject,
-    addComponentToProject, removeComponentFromProject
+    addComponentToProject,
+    removeComponentFromProject,
+    shareProject,
+    getSharedProject
 } from "../controllers/projectController.js";
 import {protect} from "../middleware/authMiddleware.js";
 
@@ -18,5 +21,7 @@ router.get("/", protect, getProjects);
 router.get("/:id", protect, getProject);
 router.put("/add-component", protect, addComponentToProject);
 router.put("/remove-component", protect, removeComponentFromProject);
+router.post("/:id/share", protect, shareProject);
+router.get("/shared/:shareId", getSharedProject);
 
 export default router;

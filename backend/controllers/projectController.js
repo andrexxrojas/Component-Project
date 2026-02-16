@@ -1,5 +1,11 @@
 import Project from "../models/project.js";
 
+// HELPER FUNCTION
+const generateShareId = () => {
+    return Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+};
+
 // [POST] Create new project
 export const newProject = async (req, res) => {
     try {
@@ -142,3 +148,81 @@ export const removeComponentFromProject = async (req, res) => {
         res.status(500).json({message: "Error removing component from project"});
     }
 }
+
+// [POST] Share an entire project
+export const shareProject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isPublic } = req.body;
+
+        const project = await Project.findOneAndUpdate(
+            {
+                _id: id,
+                userId: req.user.id
+            },
+            {
+                isPublic: isPublic ?? true,
+                shareId: generateShareId()
+            },
+            { new: true }
+        );
+
+        if (!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        const components = await Component.find({
+            projectId: id,
+            userId: req.user.id
+        });
+
+        const shareUrl = `${process.env.FRONTEND_URL}/shared/project/${project.shareId}`;
+
+        res.status(200).json({
+            shareUrl,
+            project: {
+                title: project.title,
+                components: components.map(c => ({
+                    title: c.title,
+                    files: c.files
+                }))
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error sharing project:", error });
+    }
+};
+
+// [GET] Get shared project
+export const getSharedProject = async (req, res) => {
+    try {
+        const { shareId } = req.params;
+
+        const project = await Project.findOne({
+            shareId,
+            isPublic: true
+        }).populate('userId', 'username');
+
+        if (!project) {
+            return res.status(404).json({ message: "Shared project not found or is private" });
+        }
+
+        const components = await Component.find({
+            projectId: project._id
+        }).select('title files createdAt');
+
+        res.status(200).json({
+            title: project.title,
+            description: project.description,
+            owner: project.userId?.username || 'Unknown',
+            createdAt: project.createdAt,
+            components: components.map(c => ({
+                title: c.title,
+                files: c.files,
+                createdAt: c.createdAt
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching shared project:", error });
+    }
+};

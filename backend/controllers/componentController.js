@@ -1,5 +1,72 @@
 import Component from "../models/component.js";
 
+// HELPER FUNCTION
+const generateShareId = () => {
+    return Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+};
+
+// [POST] Generate a share url for component
+export const shareComponent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isPublic } = req.body;
+
+        const component = await Component.findOneAndUpdate(
+            {
+                _id: id,
+                userId: req.user.id
+            },
+            {
+                isPublic: isPublic ?? true,
+                shareId: generateShareId()
+            },
+            { new: true }
+        );
+
+        if (!component) {
+            return res.status(404).json({ message: "Component not found" });
+        }
+
+        const shareUrl = `${process.env.FRONTEND_URL}/shared/component/${component.shareId}`;
+
+        res.status(200).json({
+            shareUrl,
+            component: {
+                title: component.title,
+                files: component.files
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error sharing component:", error });
+    }
+};
+
+// [GET] Get the shared component
+export const getSharedComponent = async (req, res) => {
+    try {
+        const { shareId } = req.params;
+
+        const component = await Component.findOne({
+            shareId,
+            isPublic: true
+        }).populate('userId', 'username');
+
+        if (!component) {
+            return res.status(404).json({ message: "Shared component not found" });
+        }
+
+        res.status(200).json({
+            title: component.title,
+            files: component.files,
+            owner: component.userId?.username || 'Unknown',
+            createdAt: component.createdAt
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching shared component:", error });
+    }
+};
+
 // [POST] Create new component
 export const newComponent = async (req, res) => {
     try {
