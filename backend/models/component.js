@@ -18,6 +18,11 @@ const componentSchema = new mongoose.Schema(
             default: "public",
         },
         imageUrl: {type: String, default: null},
+        shareId: {
+            type: String,
+            unique: true,
+            sparse: true
+        }
     },
     {timestamps: true}
 );

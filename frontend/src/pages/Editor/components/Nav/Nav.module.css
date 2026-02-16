@@ -56,3 +56,57 @@
 .btn.share {
     padding: 0.5rem;
 }
+
+.menu-anchor {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 1rem);
+    right: 0;
+    padding: var(--layout-padding);
+    border-radius: var(--small-btn-radius);
+    background-color: var(--neutral-200);
+}
+
+.share-title {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-base);
+    color: var(--neutral-950);
+    margin-bottom: 0.2rem;
+}
+
+.share-description {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xxs);
+    color: var(--neutral-400);
+    margin-bottom: 1rem;
+}
+
+.share-url-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.share-url-input {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xxs);
+    padding: 0.4rem;
+    border: none;
+    outline: none;
+    border-radius: var(--small-btn-radius);
+}
+
+.copy-btn {
+    font-family: var(--font-medium);
+    font-size: var(--font-size-xs);
+    border: none;
+    outline: none;
+    border-radius: var(--small-btn-radius);
+    user-select: none;
+    cursor: pointer;
+    padding: 0.2rem;
+}

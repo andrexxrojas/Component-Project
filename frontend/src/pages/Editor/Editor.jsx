@@ -59,7 +59,7 @@ export default function Editor() {
 
     return (
         <div className={styles["editor-wrapper"]}>
-            <Nav title={title} onSave={saveComponent}/>
+            <Nav title={title} onSave={saveComponent} componentId={id}/>
             <div className={styles["editor-container"]}>
                 <EditorGrid
                     code={code}

@@ -35,3 +35,35 @@ export const SaveComponent = async (id, files) => {
 
     return res.json();
 }
+
+export const ShareComponent = async (id, isPublic = true) => {
+    const res = await fetch(`${API_URL}/components/${id}/share`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ isPublic })
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to share component.");
+    }
+
+    return res.json();
+};
+
+export const GetSharedComponent = async (shareId) => {
+    const res = await fetch(`${API_URL}/components/shared/${shareId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch shared component.");
+    }
+
+    return res.json();
+};
