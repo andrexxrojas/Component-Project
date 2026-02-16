@@ -51,3 +51,20 @@ export const RemoveComponentFromProject = async (projectId, componentId) => {
 
     return res.json();
 }
+
+export const ShareProject = async (id, isPublic = true) => {
+    const res = await fetch(`${API_URL}/projects/${id}/share`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ isPublic })
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to share project.");
+    }
+
+    return res.json();
+}

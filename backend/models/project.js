@@ -34,6 +34,11 @@ const projectSchema = new mongoose.Schema(
             enum: ["public", "private"],
             default: "public",
         },
+        shareId: {
+            type: String,
+            unique: true,
+            sparse: true
+        }
     },
     {timestamps: true}
 )

@@ -78,6 +78,7 @@ export default function ProjectView() {
                     description={project.description || "No description provided"}
                     projectId={project._id}
                     onComponentCreated={handleComponentCreated}
+                    hasComponents={project.components.length > 0}
                 />
                 <ComponentGrid
                     components={project.components || []}

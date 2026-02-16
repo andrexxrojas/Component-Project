@@ -1,4 +1,5 @@
 import Project from "../models/project.js";
+import Component from "../models/component.js";
 
 // HELPER FUNCTION
 const generateShareId = () => {
@@ -155,33 +156,63 @@ export const shareProject = async (req, res) => {
         const { id } = req.params;
         const { isPublic } = req.body;
 
+        console.log("Sharing project:", id);
+        console.log("User ID:", req.user.id);
+
+        // Generate shareId
+        const shareId = generateShareId();
+        console.log("Generated shareId:", shareId);
+
+        // First check if project exists
+        const existingProject = await Project.findOne({
+            _id: id,
+            userId: req.user.id
+        });
+
+        if (!existingProject) {
+            console.log("Project not found");
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        console.log("Found project:", existingProject.title);
+
+        // Update the project
         const project = await Project.findOneAndUpdate(
             {
                 _id: id,
                 userId: req.user.id
             },
             {
-                isPublic: isPublic ?? true,
-                shareId: generateShareId()
+                visibility: isPublic ? "public" : "private",
+                shareId: shareId
             },
-            { new: true }
+            { new: true, runValidators: true }
         );
 
-        if (!project) {
-            return res.status(404).json({ message: "Project not found" });
-        }
-
-        const components = await Component.find({
-            projectId: id,
-            userId: req.user.id
+        console.log("Updated project:", {
+            id: project._id,
+            title: project.title,
+            visibility: project.visibility,
+            shareId: project.shareId
         });
 
-        const shareUrl = `${process.env.FRONTEND_URL}/shared/project/${project.shareId}`;
+        // Get all components in this project
+        const components = await Component.find({
+            _id: { $in: project.components }
+        });
+
+        console.log(`Found ${components.length} components`);
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const shareUrl = `${frontendUrl}/shared/project/${project.shareId}`;
 
         res.status(200).json({
             shareUrl,
             project: {
                 title: project.title,
+                description: project.description,
+                visibility: project.visibility,
+                componentCount: project.componentCount,
                 components: components.map(c => ({
                     title: c.title,
                     files: c.files
@@ -189,7 +220,11 @@ export const shareProject = async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: "Error sharing project:", error });
+        console.error("Error sharing project:", error);
+        res.status(500).json({
+            message: "Error sharing project:",
+            error: error.message
+        });
     }
 };
 
