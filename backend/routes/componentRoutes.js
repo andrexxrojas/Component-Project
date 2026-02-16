@@ -12,12 +12,13 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/shared/:shareId", getSharedComponent);
+
 router.post("/new-component", protect, newComponent)
 router.put("/save-component", protect, saveComponent)
 router.delete("/delete-component/:id", protect, deleteComponent)
 router.get("/", protect, getComponents);
 router.get("/:id", protect, getComponent);
 router.post("/:id/share", protect, shareComponent);
-router.get("/shared/:shareId", getSharedComponent);
 
 export default router;

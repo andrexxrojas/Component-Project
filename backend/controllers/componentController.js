@@ -12,6 +12,21 @@ export const shareComponent = async (req, res) => {
         const { id } = req.params;
         const { isPublic } = req.body;
 
+        const existingComponent = await Component.findOne({
+            _id: id,
+            userId: req.user.id
+        });
+
+        if (!existingComponent) {
+            return res.status(404).json({ message: "Component not found" });
+        }
+
+        let shareId = existingComponent.shareId;
+
+        if (!shareId) {
+            shareId = generateShareId();
+        }
+
         const component = await Component.findOneAndUpdate(
             {
                 _id: id,
@@ -19,14 +34,10 @@ export const shareComponent = async (req, res) => {
             },
             {
                 isPublic: isPublic ?? true,
-                shareId: generateShareId()
+                shareId: shareId
             },
             { new: true }
         );
-
-        if (!component) {
-            return res.status(404).json({ message: "Component not found" });
-        }
 
         const shareUrl = `${process.env.FRONTEND_URL}/shared/component/${component.shareId}`;
 
@@ -34,14 +45,15 @@ export const shareComponent = async (req, res) => {
             shareUrl,
             component: {
                 title: component.title,
-                files: component.files
+                files: component.files,
+                isPublic: component.isPublic
             }
         });
     } catch (error) {
-        res.status(500).json({ message: "Error sharing component:", error });
+        console.error("Error sharing component:", error);
+        res.status(500).json({ message: "Error sharing component:", error: error.message });
     }
 };
-
 // [GET] Get the shared component
 export const getSharedComponent = async (req, res) => {
     try {
@@ -49,7 +61,7 @@ export const getSharedComponent = async (req, res) => {
 
         const component = await Component.findOne({
             shareId,
-            isPublic: true
+            visibility: "public"
         }).populate('userId', 'username');
 
         if (!component) {

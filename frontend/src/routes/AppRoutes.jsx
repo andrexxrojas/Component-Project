@@ -10,6 +10,7 @@ import NotFound from "../pages/NotFound/NotFound.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
 import ProjectView from "../pages/ProjectView/ProjectView.jsx";
 import MyComponents from "../pages/MyComponents/MyComponents.jsx";
+import SharedComponent from "../pages/SharedComponent/SharedComponent.jsx";
 
 export default function AppRoutes() {
     return (
@@ -49,6 +50,9 @@ export default function AppRoutes() {
                     <PublicRoute>
                         <NotFound />
                     </PublicRoute>
+                }/>
+                <Route path="/shared/component/:shareId" element={
+                    <SharedComponent />
                 }/>
             </Routes>
         </Layout>

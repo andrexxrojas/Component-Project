@@ -159,11 +159,6 @@ export const shareProject = async (req, res) => {
         console.log("Sharing project:", id);
         console.log("User ID:", req.user.id);
 
-        // Generate shareId
-        const shareId = generateShareId();
-        console.log("Generated shareId:", shareId);
-
-        // First check if project exists
         const existingProject = await Project.findOne({
             _id: id,
             userId: req.user.id
@@ -176,7 +171,15 @@ export const shareProject = async (req, res) => {
 
         console.log("Found project:", existingProject.title);
 
-        // Update the project
+        let shareId = existingProject.shareId;
+
+        if (!shareId) {
+            shareId = generateShareId();
+            console.log("Generated new shareId:", shareId);
+        } else {
+            console.log("Using existing shareId:", shareId);
+        }
+
         const project = await Project.findOneAndUpdate(
             {
                 _id: id,
