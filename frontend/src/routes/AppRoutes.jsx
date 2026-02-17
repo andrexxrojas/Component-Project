@@ -12,6 +12,7 @@ import ProjectView from "../pages/ProjectView/ProjectView.jsx";
 import MyComponents from "../pages/MyComponents/MyComponents.jsx";
 import SharedComponent from "../pages/SharedComponent/SharedComponent.jsx";
 import SharedProject from "../pages/SharedProject/SharedProject.jsx";
+import SharedProjectComponent from "../pages/SharedProjectComponent/SharedProjectComponent.jsx";
 
 export default function AppRoutes() {
     return (
@@ -57,6 +58,9 @@ export default function AppRoutes() {
                 }/>
                 <Route path="/shared/project/:shareId" element={
                     <SharedProject />
+                }/>
+                <Route path="/shared/project/:shareId/component/:componentId" element={
+                    <SharedProjectComponent />
                 }/>
             </Routes>
         </Layout>

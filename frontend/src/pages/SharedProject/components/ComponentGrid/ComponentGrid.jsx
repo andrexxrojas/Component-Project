@@ -4,16 +4,15 @@ import {
 } from "@phosphor-icons/react";
 import {useNavigate} from "react-router-dom";
 
-const ComponentBox = ({component}) => {
+const ComponentBox = ({component, shareId}) => {
     const navigate = useNavigate();
 
     const handleNavigate = (e) => {
-        navigate(`/editor/${component._id}`);
+        navigate(`/shared/project/${shareId}/component/${component._id}`);
     }
 
-
     return (
-        <div className={styles["component-box"]}>
+        <div className={styles["component-box"]}  onClick={handleNavigate}>
             <div className={styles["component-header"]}>
                 <div className={styles["logo-container"]}>
                     <CodeIcon size={24}/>
@@ -33,7 +32,7 @@ const ComponentBox = ({component}) => {
     )
 }
 
-export default function ComponentGrid({ components = [] }) {
+export default function ComponentGrid({ components = [], shareId }) {
 
     return (
         <div className={styles["grid-container"]}>
@@ -41,6 +40,7 @@ export default function ComponentGrid({ components = [] }) {
                 <ComponentBox
                     key={component._id}
                     component={component}
+                    shareId={shareId}
                 />
             ))}
         </div>

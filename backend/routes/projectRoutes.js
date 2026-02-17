@@ -8,13 +8,15 @@ import {
     addComponentToProject,
     removeComponentFromProject,
     shareProject,
-    getSharedProject
+    getSharedProject,
+    getSharedProjectComponent
 } from "../controllers/projectController.js";
 import {protect} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.get("/shared/:shareId", getSharedProject);
+router.get("/shared/:shareId/component/:componentId", getSharedProjectComponent);
 
 router.post("/new-project", protect, newProject);
 router.put("/update-project", protect, updateProject);

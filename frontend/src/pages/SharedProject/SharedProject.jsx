@@ -2,6 +2,8 @@ import styles from "./SharedProject.module.css";
 import {GetSharedProject} from "./services/project.service.js";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
+import HeaderControls from "./components/HeaderControls/HeaderControls.jsx";
+import ComponentGrid from "./components/ComponentGrid/ComponentGrid.jsx";
 
 export default function SharedProject() {
     const { shareId } = useParams();
@@ -40,7 +42,14 @@ export default function SharedProject() {
 
     return (
         <div className={styles["shared-project-wrapper"]}>
-
+            <HeaderControls
+                title={project.title}
+                description={project.description || "No description provided"}
+            />
+            <ComponentGrid
+                components={project.components}
+                shareId={shareId}
+            />
         </div>
     )
 }

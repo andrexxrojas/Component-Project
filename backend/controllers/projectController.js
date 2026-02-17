@@ -248,11 +248,11 @@ export const getSharedProject = async (req, res) => {
         if (project.components && project.components.length > 0) {
             components = await Component.find({
                 _id: { $in: project.components }
-            }).select('title files createdAt');
+            }).select('_id title files createdAt');
         } else {
             components = await Component.find({
                 projectId: project._id
-            }).select('title files createdAt');
+            }).select('_id title files createdAt');
         }
 
         res.status(200).json({
@@ -261,6 +261,7 @@ export const getSharedProject = async (req, res) => {
             owner: project.userId?.username || 'Unknown',
             createdAt: project.createdAt,
             components: components.map(c => ({
+                _id: c._id,
                 title: c.title,
                 files: c.files,
                 createdAt: c.createdAt
@@ -269,6 +270,48 @@ export const getSharedProject = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: "Error fetching shared project:",
+            error: error.message
+        });
+    }
+};
+
+// [GET] Get shared project component
+export const getSharedProjectComponent = async (req, res) => {
+    try {
+        const { shareId, componentId } = req.params;
+
+        // Find the public project by shareId
+        const project = await Project.findOne({
+            shareId: shareId,
+            visibility: "public"
+        });
+
+        if (!project) {
+            return res.status(404).json({ message: "Shared project not found" });
+        }
+
+        // Check if the component ID exists in the project's components array
+        if (!project.components || !project.components.includes(componentId)) {
+            return res.status(404).json({ message: "Component not found in this project" });
+        }
+
+        // Find the component by ID (no projectId check needed)
+        const component = await Component.findById(componentId);
+
+        if (!component) {
+            return res.status(404).json({ message: "Component not found" });
+        }
+
+        res.status(200).json({
+            _id: component._id,
+            title: component.title,
+            files: component.files,
+            createdAt: component.createdAt
+        });
+    } catch (error) {
+        console.error("Error in getSharedProjectComponent:", error);
+        res.status(500).json({
+            message: "Error fetching shared component:",
             error: error.message
         });
     }

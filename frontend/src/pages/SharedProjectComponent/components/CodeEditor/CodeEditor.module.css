@@ -1,0 +1,58 @@
+.editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 50%;
+    width: 100%;
+    background-color: #fafafa;
+    overflow: hidden;
+}
+
+.editor-wrapper:first-child {
+    border-top: 1px solid #e5e7eb;
+}
+
+.editor-label {
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6b7280;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    font-family: monospace;
+}
+
+.editor-container {
+    flex: 1;
+    overflow: auto;
+    background-color: #fafafa;
+}
+
+.editor-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.editor-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.editor-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.editor-container::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+.editor-input {
+    min-height: 100%;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    background: transparent;
+}
+
+.editor-textarea:focus {
+    outline: none;
+}
