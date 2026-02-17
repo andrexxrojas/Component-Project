@@ -27,9 +27,13 @@ export default function SharedComponent() {
         }
     }, [shareId]);
 
-    useEffect(() => {
-        console.log(component);
-    }, [component]);
+    if (loading) {
+        return (
+            <div className={styles["shared-component-wrapper"]}>
+
+            </div>
+        )
+    }
 
     return (
         <div className={styles["share-component-wrapper"]}>

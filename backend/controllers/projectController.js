@@ -170,6 +170,7 @@ export const shareProject = async (req, res) => {
         }
 
         console.log("Found project:", existingProject.title);
+        console.log("Project components array:", existingProject.components); // Debug log
 
         let shareId = existingProject.shareId;
 
@@ -196,13 +197,23 @@ export const shareProject = async (req, res) => {
             id: project._id,
             title: project.title,
             visibility: project.visibility,
-            shareId: project.shareId
+            shareId: project.shareId,
+            componentIds: project.components // Debug log
         });
 
-        // Get all components in this project
-        const components = await Component.find({
-            _id: { $in: project.components }
-        });
+        // OPTION 1: If components are stored as IDs in the project.components array
+        let components = [];
+        if (project.components && project.components.length > 0) {
+            components = await Component.find({
+                _id: { $in: project.components }
+            });
+        }
+        // OPTION 2: If components reference the project via projectId field
+        else {
+            components = await Component.find({
+                projectId: project._id
+            });
+        }
 
         console.log(`Found ${components.length} components`);
 
@@ -215,7 +226,7 @@ export const shareProject = async (req, res) => {
                 title: project.title,
                 description: project.description,
                 visibility: project.visibility,
-                componentCount: project.componentCount,
+                componentCount: project.componentCount || components.length,
                 components: components.map(c => ({
                     title: c.title,
                     files: c.files
@@ -238,16 +249,37 @@ export const getSharedProject = async (req, res) => {
 
         const project = await Project.findOne({
             shareId,
-            isPublic: true
+            visibility: "public"
         }).populate('userId', 'username');
 
         if (!project) {
             return res.status(404).json({ message: "Shared project not found or is private" });
         }
 
-        const components = await Component.find({
-            projectId: project._id
-        }).select('title files createdAt');
+        console.log("Found shared project:", project.title);
+        console.log("Project components array:", project.components);
+
+        // Get components using the IDs from the project's components array
+        let components = [];
+        if (project.components && project.components.length > 0) {
+            components = await Component.find({
+                _id: { $in: project.components }
+            }).select('title files createdAt');
+
+            console.log(`Found ${components.length} components by ID`);
+        } else {
+            // Fallback: try finding by projectId
+            components = await Component.find({
+                projectId: project._id
+            }).select('title files createdAt');
+
+            console.log(`Found ${components.length} components by projectId`);
+        }
+
+        console.log("Components data:", components.map(c => ({
+            title: c.title,
+            filesCount: c.files?.length
+        })));
 
         res.status(200).json({
             title: project.title,
@@ -261,6 +293,10 @@ export const getSharedProject = async (req, res) => {
             }))
         });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching shared project:", error });
+        console.error("Error in getSharedProject:", error);
+        res.status(500).json({
+            message: "Error fetching shared project:",
+            error: error.message
+        });
     }
 };

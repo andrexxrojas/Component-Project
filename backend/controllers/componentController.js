@@ -1,4 +1,5 @@
 import Component from "../models/component.js";
+import Project from "../models/project.js";
 
 // HELPER FUNCTION
 const generateShareId = () => {
@@ -152,11 +153,22 @@ export const deleteComponent = async (req, res) => {
 
         if (!component) return res.status(404).json({message: "Component not found"});
 
+        // Remove this component from any projects that contain it
+        await Project.updateMany(
+            { components: req.params.id },
+            {
+                $pull: { components: req.params.id },
+                $inc: { componentCount: -1 },
+                lastUpdated: Date.now()
+            }
+        );
+
         res.status(200).json({message: "Component deleted successfully"});
     } catch (error) {
-        res.status(500).json("Error deleting component:", error)
+        console.error("Error deleting component:", error);
+        res.status(500).json({message: "Error deleting component:", error: error.message});
     }
-}
+};
 
 // [GET] Get all components
 export const getComponents = async (req, res) => {

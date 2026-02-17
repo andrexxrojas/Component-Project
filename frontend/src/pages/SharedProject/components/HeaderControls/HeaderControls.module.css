@@ -81,7 +81,6 @@
     padding: var(--layout-padding);
     border-radius: var(--small-btn-radius);
     background-color: var(--neutral-200);
-    z-index: 10;
 }
 
 .share-title {

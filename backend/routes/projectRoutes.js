@@ -14,6 +14,8 @@ import {protect} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/shared/:shareId", getSharedProject);
+
 router.post("/new-project", protect, newProject);
 router.put("/update-project", protect, updateProject);
 router.delete("/delete-project/:id", protect, deleteProject);
@@ -22,6 +24,5 @@ router.get("/:id", protect, getProject);
 router.put("/add-component", protect, addComponentToProject);
 router.put("/remove-component", protect, removeComponentFromProject);
 router.post("/:id/share", protect, shareProject);
-router.get("/shared/:shareId", getSharedProject);
 
 export default router;
