@@ -280,7 +280,6 @@ export const getSharedProjectComponent = async (req, res) => {
     try {
         const { shareId, componentId } = req.params;
 
-        // Find the public project by shareId
         const project = await Project.findOne({
             shareId: shareId,
             visibility: "public"
@@ -290,12 +289,10 @@ export const getSharedProjectComponent = async (req, res) => {
             return res.status(404).json({ message: "Shared project not found" });
         }
 
-        // Check if the component ID exists in the project's components array
         if (!project.components || !project.components.includes(componentId)) {
             return res.status(404).json({ message: "Component not found in this project" });
         }
 
-        // Find the component by ID (no projectId check needed)
         const component = await Component.findById(componentId);
 
         if (!component) {
