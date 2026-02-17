@@ -48,11 +48,6 @@ export default function AppRoutes() {
                         <Editor />
                     </ProtectedRoute>
                 }/>
-                <Route path="*" element={
-                    <PublicRoute>
-                        <NotFound />
-                    </PublicRoute>
-                }/>
                 <Route path="/shared/component/:shareId" element={
                     <SharedComponent />
                 }/>
@@ -61,6 +56,11 @@ export default function AppRoutes() {
                 }/>
                 <Route path="/shared/project/:shareId/component/:componentId" element={
                     <SharedProjectComponent />
+                }/>
+                <Route path="*" element={
+                    <PublicRoute>
+                        <NotFound />
+                    </PublicRoute>
                 }/>
             </Routes>
         </Layout>
