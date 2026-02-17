@@ -1,4 +1,4 @@
-import styles from "./sharedProjectComponent.module.css";
+import styles from "./SharedProjectComponent.module.css";
 import Nav from "../SharedComponent/components/Nav/Nav.jsx";
 import EditorGrid from "../SharedComponent/components/EditorGrid/EditorGrid.jsx";
 import {useState, useEffect} from "react";
