@@ -92,9 +92,9 @@ const ComponentBox = ({component, onRename, onDelete}) => {
             </div>
             <div className={styles["component-info"]}>
                 <h4 className={styles["component-title"]}>{component.title}</h4>
-                <div className={styles["preview-container"]}>
-                    {component.preview ? (
-                        <img src={component.preview} alt="component preview image"/>
+                <div className={`${styles["preview-container"]} ${component.imageUrl ? styles["has-image"] : ""}`}>
+                    {component.imageUrl ? (
+                        <img src={component.imageUrl} alt="component preview image"/>
                     ) : (
                         <span className={styles["empty-preview-txt"]}>Empty Preview</span>
                     )}

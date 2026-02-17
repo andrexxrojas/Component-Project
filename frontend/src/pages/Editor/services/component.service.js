@@ -17,7 +17,33 @@ export const GetComponent = async (id) => {
 }
 
 export const SaveComponent = async (id, files) => {
-    const res = await fetch (`${API_URL}/components/save-component`, {
+    // FIRST generate screenshot
+    let imageUrl = null;
+
+    try {
+        const screenshotRes = await fetch(`${API_URL}/screenshot`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                css: files.css,
+                js: files.js
+            })
+        });
+
+        if (screenshotRes.ok) {
+            const screenshotData = await screenshotRes.json();
+            imageUrl = screenshotData.imageUrl;
+            console.log("Screenshot generated successfully");
+        }
+    } catch (screenshotError) {
+        console.error("Screenshot generation failed:", screenshotError);
+        // Continue with save even if screenshot fails
+    }
+
+    // THEN save component WITH the screenshot URL
+    const saveRes = await fetch(`${API_URL}/components/save-component`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -26,15 +52,16 @@ export const SaveComponent = async (id, files) => {
         body: JSON.stringify({
             id,
             files: files,
+            imageUrl: imageUrl // Include the screenshot URL
         })
     });
 
-    if (!res.ok) {
+    if (!saveRes.ok) {
         throw new Error("Failed to update component");
     }
 
-    return res.json();
-}
+    return saveRes.json();
+};
 
 export const ShareComponent = async (id, isPublic = true) => {
     const res = await fetch(`${API_URL}/components/${id}/share`, {

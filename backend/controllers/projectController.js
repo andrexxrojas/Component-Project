@@ -91,7 +91,7 @@ export const getProject = async (req, res) => {
         const project = await Project.findOne({
             _id: req.params.id,
             userId: req.user.id,
-        }).populate("components", "title visibility files");
+        }).populate("components", "title visibility files imageUrl");
 
         if (!project)
             return res.status(404).json({message: "Project not found or unauthorized"});
@@ -248,11 +248,11 @@ export const getSharedProject = async (req, res) => {
         if (project.components && project.components.length > 0) {
             components = await Component.find({
                 _id: { $in: project.components }
-            }).select('_id title files createdAt');
+            }).select('_id title files createdAt imageUrl');
         } else {
             components = await Component.find({
                 projectId: project._id
-            }).select('_id title files createdAt');
+            }).select('_id title files createdAt imageUrl');
         }
 
         res.status(200).json({
@@ -264,7 +264,8 @@ export const getSharedProject = async (req, res) => {
                 _id: c._id,
                 title: c.title,
                 files: c.files,
-                createdAt: c.createdAt
+                createdAt: c.createdAt,
+                imageUrl: c.imageUrl,
             }))
         });
     } catch (error) {

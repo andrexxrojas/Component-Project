@@ -1,88 +1,128 @@
 import puppeteer from "puppeteer";
 import babel from "@babel/core";
 
-const transformJSX = (jsCode) => {
-    // Replace "export default" with "const App ="
-    const cleaned = jsCode.replace(/export\s+default\s+/g, "const App = ");
+const CDN = {
+    react: "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+    reactDOM: "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
+};
 
-    const {code} = babel.transformSync(cleaned, {
+const transformJSX = (jsCode) => {
+    const cleaned = jsCode.replace(/export\s+default\s+/g, '');
+    let wrappedCode = cleaned;
+
+    if (!cleaned.includes('=>') || !cleaned.includes('return')) {
+        wrappedCode = `const App = () => { return (${cleaned}); };`;
+    } else {
+        wrappedCode = cleaned.replace(
+            /(const|let|var)\s+([A-Z][A-Za-z0-9_]*)\s*=\s*(\(\))?\s*=>/,
+            'const App =$3 =>'
+        );
+    }
+
+    const { code } = babel.transformSync(wrappedCode, {
         presets: ["@babel/preset-react"],
-        plugins: ["@babel/plugin-transform-modules-umd"], // UMD to wrap
+        plugins: ["@babel/plugin-transform-modules-umd"],
     });
 
-    // Move window.App assignment inside the IIFE
-    return code.replace(
-        /}\);$/,
-        `window.App = App; });`
-    );
+    return code.replace(/}\);$/, `window.App = App; });`);
 };
 
 export const generateScreenshot = async (req, res) => {
-    const {html, css, js} = req.body;
+    const { css, js } = req.body;
 
-    if (!html || !js) return res.status(400).json({error: "HTML and JS required"});
+    if (!js) return res.status(400).json({ error: "JS is required" });
+
+    let browser = null;
 
     try {
         const compiledJS = transformJSX(js);
 
-        console.log("=== COMPILED JS ===");
-        console.log(compiledJS);
-        console.log("==================");
-
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox", "--window-size=1920,1080"],
+        browser = await puppeteer.launch({
+            headless: "new",
+            args: [
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process",
+            ],
         });
 
         const page = await browser.newPage();
-        await page.setViewport({width: 500, height: 500, deviceScaleFactor: 2});
+        await page.setViewport({ width: 500, height: 500, deviceScaleFactor: 2 });
 
-        // Log console messages
-        page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
-        page.on("pageerror", (err) => console.error("PAGE ERROR:", err));
+        await page.setContent(
+            `<html>
+                <head>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { 
+                            background: white;
+                            min-height: 100vh;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        }
+                        #app {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        }
+                        ${css || ""}
+                    </style>
+                </head>
+                <body>
+                    <div id="app"></div>
+                </body>
+            </html>`,
+            { waitUntil: "networkidle0" }
+        );
 
-        // Load your HTML content (only basic structure; no React scripts)
-        await page.setContent(`
-      <html>
-        <head>
-          <style>
-            body { background: white; }
-            ${css || ""}
-          </style>
-        </head>
-        <body>
-          <div id="app"></div>
-        </body>
-      </html>
-    `, {waitUntil: "domcontentloaded"});
+        await page.addScriptTag({ url: CDN.react });
+        await page.addScriptTag({ url: CDN.reactDOM });
+        await page.addScriptTag({ content: compiledJS });
 
-        // Inject React and ReactDOM from CDN
-        await page.addScriptTag({url: "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.min.js"});
-        await page.addScriptTag({url: "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.min.js"});
+        await page.waitForFunction(
+            () => window.App && window.React && window.ReactDOM,
+            { timeout: 15000 }
+        );
 
-        // Inject compiled JSX (App)
-        await page.addScriptTag({content: compiledJS});
-
-        // Wait for App to be defined
-        await page.waitForFunction(() => window.App !== undefined && window.React && window.ReactDOM);
-
-        // Render App
         await page.evaluate(() => {
             const root = ReactDOM.createRoot(document.getElementById("app"));
             root.render(React.createElement(window.App));
         });
 
-        // Wait a little for styles and fonts to apply
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Screenshot
-        const screenshotBuffer = await page.screenshot({fullPage: true, omitBackground: false});
-        await browser.close();
+        const dimensions = await page.evaluate(() => {
+            const app = document.getElementById('app');
+            const rect = app.getBoundingClientRect();
+            return {
+                width: Math.ceil(rect.width),
+                height: Math.ceil(rect.height)
+            };
+        });
 
-        res.json({imageUrl: `data:image/png;base64,${screenshotBuffer.toString("base64")}`});
+        let screenshot;
+        if (dimensions.width > 500 || dimensions.height > 500) {
+            screenshot = await page.screenshot({ fullPage: true });
+        } else {
+            screenshot = await page.screenshot({
+                clip: {
+                    x: Math.max(0, (500 - dimensions.width) / 2),
+                    y: Math.max(0, (500 - dimensions.height) / 2),
+                    width: dimensions.width,
+                    height: dimensions.height
+                }
+            });
+        }
+
+        res.json({ imageUrl: `data:image/png;base64,${screenshot.toString("base64")}` });
 
     } catch (err) {
-        console.error("Puppeteer screenshot error:", err);
-        res.status(500).json({error: "Failed to generate screenshot"});
+        res.status(500).json({ error: "Failed to generate screenshot" });
+
+    } finally {
+        await browser?.close();
     }
 };
