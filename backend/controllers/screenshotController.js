@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import babel from "@babel/core";
 
 const CDN = {
@@ -7,52 +8,141 @@ const CDN = {
 };
 
 const transformJSX = (jsCode) => {
-    const cleaned = jsCode.replace(/export\s+default\s+/g, '');
-    let wrappedCode = cleaned;
+    try {
+        console.log('Transforming JSX...');
 
-    if (!cleaned.includes('=>') || !cleaned.includes('return')) {
-        wrappedCode = `const App = () => { return (${cleaned}); };`;
-    } else {
-        wrappedCode = cleaned.replace(
-            /(const|let|var)\s+([A-Z][A-Za-z0-9_]*)\s*=\s*(\(\))?\s*=>/,
-            'const App =$3 =>'
-        );
+        let cleaned = jsCode.replace(/export\s+default\s+/g, '');
+
+        let wrappedCode = cleaned;
+
+        const hasComponentDefinition = cleaned.includes('=>') ||
+            cleaned.includes('function') ||
+            cleaned.includes('return');
+
+        if (!hasComponentDefinition) {
+            wrappedCode = `const App = () => { return (${cleaned}); };`;
+        } else {
+            wrappedCode = cleaned.replace(
+                /(const|let|var)\s+([A-Za-z0-9_]+)\s*=\s*(\(\))?\s*=>/,
+                'const App =$3 =>'
+            );
+
+            wrappedCode = wrappedCode.replace(
+                /function\s+([A-Za-z0-9_]+)\s*\(/,
+                'function App('
+            );
+        }
+
+        const result = babel.transformSync(wrappedCode, {
+            presets: ["@babel/preset-react"],
+            plugins: ["@babel/plugin-transform-modules-umd"],
+        });
+
+        let finalCode = result.code;
+
+        if (finalCode.includes('});')) {
+            finalCode = finalCode.replace(/}\);$/, 'window.App = App; });');
+        } else {
+            finalCode += '\nwindow.App = App;';
+        }
+
+        return finalCode;
+    } catch (error) {
+        console.error('JSX Transformation Error:', error);
+        throw new Error(`Failed to transform JSX: ${error.message}`);
     }
+};
 
-    const { code } = babel.transformSync(wrappedCode, {
-        presets: ["@babel/preset-react"],
-        plugins: ["@babel/plugin-transform-modules-umd"],
-    });
+const getBrowserLaunchOptions = async () => {
+    const isVercel = process.env.VERCEL === "1";
+    const isProduction = process.env.NODE_ENV === "production";
+    const isAwsLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 
-    return code.replace(/}\);$/, `window.App = App; });`);
+    if (isVercel || isProduction || isAwsLambda) {
+
+        const executablePath = await chromium.executablePath();
+
+        return {
+            args: [
+                ...chromium.args,
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--single-process',
+            ],
+            executablePath,
+            headless: chromium.headless,
+            defaultViewport: {
+                width: 500,
+                height: 500,
+                deviceScaleFactor: 2
+            }
+        };
+    }
+    else {
+        console.log('Using local Puppeteer configuration');
+
+        const fullPuppeteer = await import('puppeteer');
+
+        return {
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+            ],
+            headless: 'new',
+            defaultViewport: {
+                width: 500,
+                height: 500,
+                deviceScaleFactor: 2
+            }
+        };
+    }
 };
 
 export const generateScreenshot = async (req, res) => {
     const { css, js } = req.body;
 
-    if (!js) return res.status(400).json({ error: "JS is required" });
+    if (!js) {
+        return res.status(400).json({ error: "JS is required" });
+    }
 
     let browser = null;
 
     try {
+        console.log('=== Starting Screenshot Generation ===');
+
+        console.log('Step 1: Transforming JSX...');
         const compiledJS = transformJSX(js);
+        console.log('✓ JSX transformed successfully');
 
-        browser = await puppeteer.launch({
-            headless: "new",
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--single-process",
-            ],
-        });
+        console.log('Step 2: Configuring browser...');
+        const launchOptions = await getBrowserLaunchOptions();
+        console.log('Environment:', process.env.NODE_ENV || 'development');
+        console.log('Launch options:', JSON.stringify({
+            ...launchOptions,
+            executablePath: launchOptions.executablePath || 'default'
+        }, null, 2));
 
+        console.log('Step 3: Launching browser...');
+        browser = await puppeteer.launch(launchOptions);
+        console.log('✓ Browser launched');
+
+        console.log('Step 4: Creating page...');
         const page = await browser.newPage();
-        await page.setViewport({ width: 500, height: 500, deviceScaleFactor: 2 });
 
-        await page.setContent(
-            `<html>
+        const timeout = process.env.NODE_ENV === 'production' ? 10000 : 30000;
+        page.setDefaultTimeout(timeout);
+
+        await page.setViewport({ width: 500, height: 500, deviceScaleFactor: 2 });
+        console.log('✓ Page created and viewport set');
+
+        console.log('Step 5: Preparing HTML content...');
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
                 <head>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -62,67 +152,139 @@ export const generateScreenshot = async (req, res) => {
                             display: flex;
                             justify-content: center;
                             align-items: center;
+                            font-family: system-ui, -apple-system, sans-serif;
                         }
-                        #app {
+                        #root {
                             display: flex;
                             justify-content: center;
                             align-items: center;
+                            width: 100%;
                         }
                         ${css || ""}
                     </style>
                 </head>
                 <body>
-                    <div id="app"></div>
+                    <div id="root"></div>
+
+                    <script src="${CDN.react}"></script>
+                    <script src="${CDN.reactDOM}"></script>
+
+                    <script>
+                        ${compiledJS}
+
+                        window.addEventListener('load', function() {
+                            console.log('Window loaded');
+                            if (window.App && window.ReactDOM && window.React) {
+                                try {
+                                    const root = ReactDOM.createRoot(document.getElementById('root'));
+                                    root.render(React.createElement(window.App));
+                                    console.log('✓ Component rendered');
+                                } catch (err) {
+                                    console.error('Render error:', err);
+                                    document.getElementById('root').innerHTML = 'Render Error: ' + err.message;
+                                }
+                            } else {
+                                console.error('Missing dependencies:', {
+                                    App: !!window.App,
+                                    ReactDOM: !!window.ReactDOM,
+                                    React: !!window.React
+                                });
+                            }
+                        });
+                    </script>
                 </body>
-            </html>`,
-            { waitUntil: "networkidle0" }
-        );
+            </html>
+        `;
 
-        await page.addScriptTag({ url: CDN.react });
-        await page.addScriptTag({ url: CDN.reactDOM });
-        await page.addScriptTag({ content: compiledJS });
+        console.log('Step 6: Setting page content...');
+        await page.setContent(htmlContent, {
+            waitUntil: ["load", "networkidle0"],
+            timeout
+        });
+        console.log('✓ Page content set');
 
+        console.log('Step 7: Waiting for component to render...');
         await page.waitForFunction(
-            () => window.App && window.React && window.ReactDOM,
-            { timeout: 15000 }
+            () => {
+                const root = document.getElementById('root');
+                return root && root.children.length > 0;
+            },
+            { timeout, polling: 100 }
         );
+        console.log('✓ Component rendered');
 
-        await page.evaluate(() => {
-            const root = ReactDOM.createRoot(document.getElementById("app"));
-            root.render(React.createElement(window.App));
-        });
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
+        console.log('Step 8: Calculating dimensions...');
         const dimensions = await page.evaluate(() => {
-            const app = document.getElementById('app');
-            const rect = app.getBoundingClientRect();
-            return {
-                width: Math.ceil(rect.width),
-                height: Math.ceil(rect.height)
-            };
+            const root = document.getElementById('root');
+            const firstChild = root?.children[0];
+            if (firstChild) {
+                const rect = firstChild.getBoundingClientRect();
+                return {
+                    width: Math.max(1, Math.ceil(rect.width)),
+                    height: Math.max(1, Math.ceil(rect.height))
+                };
+            }
+            return { width: 500, height: 500 };
         });
+        console.log('Dimensions:', dimensions);
 
-        let screenshot;
+        console.log('Step 9: Taking screenshot...');
+        let screenshotBuffer;
         if (dimensions.width > 500 || dimensions.height > 500) {
-            screenshot = await page.screenshot({ fullPage: true });
+            screenshotBuffer = await page.screenshot({
+                fullPage: true,
+                type: 'png',
+                encoding: 'binary'
+            });
         } else {
-            screenshot = await page.screenshot({
+            screenshotBuffer = await page.screenshot({
                 clip: {
                     x: Math.max(0, (500 - dimensions.width) / 2),
                     y: Math.max(0, (500 - dimensions.height) / 2),
                     width: dimensions.width,
                     height: dimensions.height
-                }
+                },
+                type: 'png',
+                encoding: 'binary'
             });
         }
+        console.log('✓ Screenshot taken, size:', screenshotBuffer.length, 'bytes');
 
-        res.json({ imageUrl: `data:image/png;base64,${screenshot.toString("base64")}` });
+        const base64Image = screenshotBuffer.toString('base64');
+
+        console.log('=== Screenshot Generation Complete ===');
+
+        res.json({
+            success: true,
+            imageUrl: `data:image/png;base64,${base64Image}`
+        });
 
     } catch (err) {
-        res.status(500).json({ error: "Failed to generate screenshot" });
+        console.error('❌ Screenshot generation failed:', {
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+        });
+
+        const errorResponse = {
+            error: "Failed to generate screenshot",
+            details: err.message
+        };
+
+        if (process.env.NODE_ENV !== 'production') {
+            errorResponse.stack = err.stack;
+        }
+
+        res.status(500).json(errorResponse);
 
     } finally {
-        await browser?.close();
+        if (browser) {
+            try {
+                await browser.close();
+                console.log('✓ Browser closed');
+            } catch (closeError) {
+                console.error('Error closing browser:', closeError);
+            }
+        }
     }
 };
