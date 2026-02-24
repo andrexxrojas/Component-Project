@@ -57,6 +57,10 @@
     padding: 0.5rem;
 }
 
+.btn.save:disabled {
+    pointer-events: none;
+}
+
 .menu-anchor {
     position: relative;
 }

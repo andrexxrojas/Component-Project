@@ -11,6 +11,7 @@ export default function Editor() {
     const [code, setCode] = useState("");
     const [css, setCss] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         const fetchComponent = async () => {
@@ -34,6 +35,8 @@ export default function Editor() {
 
     const saveComponent = async () => {
         try {
+            setSaving(true);
+
             const files = {
                 css: css,
                 js: code,
@@ -43,6 +46,8 @@ export default function Editor() {
             console.log(res);
         } catch (error) {
             console.error("Failed to save component:", error);
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -59,7 +64,7 @@ export default function Editor() {
 
     return (
         <div className={styles["editor-wrapper"]}>
-            <Nav title={title} onSave={saveComponent} componentId={id}/>
+            <Nav title={title} onSave={saveComponent} isSaving={saving} componentId={id}/>
             <div className={styles["editor-container"]}>
                 <EditorGrid
                     code={code}

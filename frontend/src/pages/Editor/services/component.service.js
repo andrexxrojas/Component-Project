@@ -17,7 +17,6 @@ export const GetComponent = async (id) => {
 }
 
 export const SaveComponent = async (id, files) => {
-    // FIRST generate screenshot
     let imageUrl = null;
 
     try {
@@ -39,10 +38,8 @@ export const SaveComponent = async (id, files) => {
         }
     } catch (screenshotError) {
         console.error("Screenshot generation failed:", screenshotError);
-        // Continue with save even if screenshot fails
     }
 
-    // THEN save component WITH the screenshot URL
     const saveRes = await fetch(`${API_URL}/components/save-component`, {
         method: "PUT",
         headers: {
@@ -52,7 +49,7 @@ export const SaveComponent = async (id, files) => {
         body: JSON.stringify({
             id,
             files: files,
-            imageUrl: imageUrl // Include the screenshot URL
+            imageUrl: imageUrl
         })
     });
 

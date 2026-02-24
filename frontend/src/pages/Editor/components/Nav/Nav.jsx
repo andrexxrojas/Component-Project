@@ -73,7 +73,7 @@ const ShareButton = ({ componentId, type = "component" }) => {
     )
 }
 
-export default function Nav({title, onSave, componentId}) {
+export default function Nav({title, onSave, isSaving, componentId}) {
     const navigate = useNavigate();
 
     const handleGoBack = async (e) => {
@@ -91,9 +91,13 @@ export default function Nav({title, onSave, componentId}) {
                     <h4 className={styles["nav-title"]}>{title}</h4>
                 </div>
                 <div className={`${styles["nav-group"]} ${styles["right"]}`}>
-                    <button className={`${styles["btn"]} ${styles["save"]}`} onClick={onSave}>
+                    <button
+                        className={`${styles["btn"]} ${styles["save"]}`}
+                        onClick={onSave}
+                        disabled={isSaving}
+                    >
                         <FloppyDiskIcon size={16}/>
-                        Save
+                        {isSaving ? "Saving..." : "Save"}
                     </button>
                     <ShareButton componentId={componentId} />
                 </div>
